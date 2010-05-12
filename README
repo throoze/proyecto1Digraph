@@ -1,0 +1,104 @@
+############################# PROYECTO 1 - ALGORITMOS Y ESTRUCTURAS III - USB ###########################
+
+El objetivo de este proyecto es realizar la implementación de la estructura Grafo Dirigido usando dos
+representaciones: el grafo como matriz de adyacencias y el grafo como un vector de listas enlazadas. Se
+provee un conjunto de archivos con las firmas de las clases cuya implementación debe ser completada
+por Uds.:
+
+• DiGraph
+• DiGraphMatrix
+• DiGraphList
+• Arc
+• List
+
+La clase abstracta DiGrafo define, entro otros, el método RoyWarshall. Este método debe ser
+implementado por cada una de las especializaciones de Digrafo: DiGrafoList y DiGrafoMatrix. Cada
+una de estas implementaciones debe hacer uso de la representación interna para lograr una mayor
+eficiencia. En otras palabras, el método Roy-Warshall de DiGraphMatrix debe ser implementado
+directamente sobre la matriz de adyacencias matrix y el de DiGraphList sobre los vectores inArcs y
+outArcs.
+
+La aplicación que Ud. deberá desarrollar consiste en un programa que recibe un nombre de archivo
+(que contiene un grafo, usando el formato descrito en el anexo 1) y se debe construir un grafo a partir
+de la información contenida en el archivo y aplicara el algoritmo Roy-Warshall a ese grafo.
+
+El pseudo código de este programa principal es:
+
+1.Leer el archivo recibido como parámetro y generar el grafo correspondiente g1
+2.si g1.numeroArcos < g1.numNodos
+3.aplicar la implementación de RoyWarshall definida para la clase DiGrafoList
+4.sino
+5.aplicar la implementación de RoyWarshall definida para la clase DiGrafoMatrix
+6.Imprimir el grafo resultante por la pantalla usando el mismo formato definido en el anexo 1.
+
+##### Sistanxis:
+
+# java Main <fileName>
+
+##### Entrega
+
+Para el martes 25 de Mayo (semana 5) a la 1:30 pm usted deberá entregar a su profesor (en el salón de
+clases), un sobre sellado y debidamente identificado con su nombre, carnet y profesor de laboratorio.
+Éste debe contener:
+
+•Códigos fuente documentados de los tipos implementados.
+
+•Ud deberá colocar el archivo con su proyecto en Aula Virtual, para lo cual deberá crear el
+ directorio PROY1 dentro de la carpeta documentos de su grupo. Note que debe estar suscrito a
+ algún grupo en aula Virtual para poder optar a esta opción. En este directorio colocará los
+ archivos con los fuentes de su aplicación. El archivo debe tener como nombre
+ P1G<#grupo>.zip que contenga un directorio P1G<#grupo> que a su vez contenga todos los
+ archivos .java de su proyecto.
+
+##### Observaciones
+
+En la evaluación del proyecto se tomará en cuenta el estilo de programación, desempeño, uso de
+herencia, correcto uso y manejo de excepciones, etc. Proyectos que no compilen serían calificados con
+cero.
+
+
+##### Referencias
+
+1. [Ortega,Meza] Maruja Ortega y Oscar Meza. Grafos y Algoritmos. Colección Tesis Ciencias
+Aplicadas. Equinoccio. Caracas, 1993.
+2. [Ambler] Writing Robust Java Code. Scott W. Ambler Software Process Mentor 2000.
+3. Guía de estilo publicada en Aula Virtual javaCodingStandards.pdf
+
+##### Anexo 1
+
+Cada implementación de Grafo contará con un constructor que permitirá leer un grafo de un archivo.
+Este archivo debe cumplir con el siguiente formato:
+n m
+n0 n1
+n1 n2
+n2 n3
+n3 n0
+
+Esto es:
+
+numNodos numArcos
+nodoFuente nodoDestino
+nodoFuente nodoDestino
+nodoFuente nodoDestino
+nodoFuente nodoDestino
+
+
+Donde n es el número de nodos que contiene el grafo y m el número de arcos. ni representa el vértice i
+del grafo. El siguiente es un ejemplo del contenido de un archivo válido con este formato.
+En el archivo
+
+4 4
+0 1
+1 2
+2 3
+3 0
+
+El grafo que representa
+
+ O ---------> 1
+ |            |
+ |            |
+ |            |
+ |            |
+ \/          \/
+ 3 <--------- 2

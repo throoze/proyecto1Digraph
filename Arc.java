@@ -15,6 +15,10 @@ public class Arc {
     private int src = -1;
     private int dst = -1;
 
+    public Arc() {
+        super();
+    }
+
     /**
      * Crea un arco entre los nodos src y dst
      *
@@ -24,6 +28,19 @@ public class Arc {
     public Arc(int src, int dst) {
        this.src = src;
        this.dst = dst;
+    }
+
+    public Arc(int src, int dst, double cost) {
+       this.src = src;
+       this.dst = dst;
+       this.cost = cost;
+    }
+
+    public Arc(int src, int dst, double cost, String id) {
+       this.src = src;
+       this.dst = dst;
+       this.cost = cost;
+       this.id = id;
     }
 
     /**

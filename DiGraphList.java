@@ -196,11 +196,21 @@ public class DiGraphList extends DiGraph {
     }
 
     public Arc addArc(int src, int dst) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Arc nuevo = new Arc(src,dst);
+        if (!(this.isArc(src, dst))) {
+            this.inArcs[dst].add(nuevo);
+            this.outArcs[src].add(nuevo);
+        }
+        return (nuevo);
     }
 
     public Arc addArc(int src, int dst, double costo) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Arc nuevo = new Arc(src,dst,costo);
+        if (!(this.isArc(src, dst))) {
+            this.inArcs[dst].add(nuevo);
+            this.outArcs[src].add(nuevo);
+        }
+        return (nuevo);
     }
 
     public List<Integer> getPredecesors(int nodeId) {

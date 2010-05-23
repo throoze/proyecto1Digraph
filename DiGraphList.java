@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -25,6 +26,11 @@ public class DiGraphList extends DiGraph {
     // de los arcos que cuyo fuente es el nodo i
     private List<Arc> outArcs[];
 
+    public DiGraphList() {
+        this.inArcs = null;
+        this.outArcs = null;
+    }
+
     /**
      * Crea un DiGraphList con n nodos y sin arcos.
      * @param n numero de nodos iniciales de grafo
@@ -38,16 +44,76 @@ public class DiGraphList extends DiGraph {
      * Crea un DiGraphList a partir del contenido de un archivo
      * @param fileName nombre del archivo
      */
-    public DiGraphList(String fileName) throws FileNotFoundException {
-        BufferedReader inbuff = new BufferedReader(new FileReader(fileName));
-        try {
-            int k = 1;
-            String linea = "";
-            while (linea != null){
-                linea = inbuff.readLine();
+    public DiGraphList(String fileName) throws ExcepcionArchivoNoSePuedeLeer,
+                                               ExcepcionFormatoIncorrecto,
+                                               ExcepcionArchivoNoExiste,
+                                               ExcepcionNoEsArchivo
+    {
+        if ((new File(fileName)).exists() &&
+            (new File(fileName)).isFile() &&
+            (new File(fileName)).canRead())  {
+            BufferedReader inbuff = null;
+            try {
+                inbuff = new BufferedReader(new FileReader(fileName));
+            } catch (FileNotFoundException fnfe) {
+                System.out.println("Esto no deberia pasar, contacte" +
+                        " al programador...");
+                System.out.println("MENSAJE:" + fnfe.getMessage() + "\n" +
+                        "CAUSA:" + fnfe.getCause().toString() + "\n");
+                throw new ExcepcionArchivoNoSePuedeLeer("Problema Leyendo el" +
+                        " archivo \"" + fileName +
+                        "\" al momento de crear el buffer lector...\n");
             }
-        } catch (IOException ex) {
-            Logger.getLogger(DiGraphList.class.getName()).log(Level.SEVERE, null, ex);
+            String linea = null;
+            try {
+                 linea = inbuff.readLine();
+            } catch (IOException ioe) {
+                System.out.println("Esto no deberia pasar, contacte" +
+                        " al programador...");
+                System.out.println("MENSAJE:" + ioe.getMessage() + "\n" +
+                        "CAUSA:" + ioe.getCause().toString() + "\n");
+                throw new ExcepcionArchivoNoSePuedeLeer("Problema Leyendo la" +
+                        "primera linea del archivo \"" + fileName +
+                        "\"");
+            }
+            String[] tokens = linea.split(" ");
+            if (tokens.length == 2) {
+                if (tokens[0].matches("[0-9]+?") &&
+                    tokens[1].matches("[0-9]+?")) {
+                    /* Aqui empiezan las diferencias en este constructor entre
+                     * DiGraphList y DiGraphMatrix
+                     */
+                    this.inArcs = new List[new Integer(tokens[0]).intValue()];
+                    this.outArcs = new List[new Integer(tokens[0]).intValue()];
+                    /* HASTA AQUI SOLO SE HAN INICIALIZADO LOS ARREGLOS DE
+                     * LISTAS. FALTA LLENAR EL GRAFO. CREO QUE ES MEJOR HACER
+                     * OTRO METODO PARA ESO Y LLAMARLO DESDE AQUI.
+                     */
+                    /* Fin de las diferencias en este constructor entre
+                     * DiGraphList y DiGraphMatrix
+                     */
+                } else {
+                    throw new ExcepcionFormatoIncorrecto("En la primera linea" +
+                            " hay un error de sintaxis: Se esperaba un numero" +
+                            " seguido de otro numero (numNodos numArcos) y se" +
+                            " encontro: " + tokens[0] + " " + tokens[1] + "\n");
+                }
+            } else {
+                throw new ExcepcionFormatoIncorrecto("En la primera linea hay" +
+                        "un error de sintaxis: Se esperaban dos elementos (" +
+                        "numNodos numArcos), y se encontro:\n\t"+
+                        tokens.toString());
+            }
+        } else if (!(new File(fileName)).exists()) {
+            throw new ExcepcionArchivoNoExiste("Problema al leer el archivo " +
+                    "\"" + fileName +"\": EL ARCHIVO NO EXISTE!!!");
+        } else if (!(new File(fileName)).isFile()) {
+            throw new ExcepcionNoEsArchivo("Problema al leer el archivo \"" +
+                    fileName +"\": NO ES UN ARCHIVO!!!");
+        } else if (!(new File(fileName)).canRead()) {
+            throw new ExcepcionArchivoNoSePuedeLeer("Problema al leer el ar" +
+                    "chivo \"" + fileName +"\": ESTE ARCHIVO NO SE PUEDE" +
+                    " LEER!!!");
         }
     }
 

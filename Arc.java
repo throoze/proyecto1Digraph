@@ -85,16 +85,6 @@ public class Arc {
     }
 
     /**
-     * Retorna la representacion en String del Arc
-     * 
-     * @return la representacion en String de este Arc
-     */
-    @Override
-    public String toString() {
-       return "(" + src + ", "+ dst+")";
-    }
-
-    /**
      * Devuelve la etiqueta del arco.
      * @return La etiqueta del arco
      * @since 2.0
@@ -110,5 +100,31 @@ public class Arc {
      */
     public void setId(String s) {
         this.id = s;
+    }
+
+    public int getSrc() {
+        return this.src;
+    }
+
+    public void setSrc(int fuente) {
+        this.src = fuente;
+    }
+
+    public int getDst() {
+        return this.dst;
+    }
+
+    public void setDst(int destino) {
+        this.dst = destino;
+    }
+
+    /**
+     * Retorna la representacion en String del Arc
+     * 
+     * @return la representacion en String de este Arc
+     */
+    @Override
+    public String toString() {
+       return "(" + src + ", "+ dst+")";
     }
 }

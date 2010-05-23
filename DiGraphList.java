@@ -1,5 +1,14 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
- * DiGraphList es una clase comcreta que ud debe implementar
+ * DiGraphList es una clase concreta que ud debe implementar
  * Los arcos son almacenados como una lista y son almacenados en un
  * arreglo donde la posicion i
  *
@@ -7,48 +16,53 @@
  * @version 1.0
  * @since 1.6
 **/
-
-import java.io.IOException;
-
 public class DiGraphList extends DiGraph {
 
     // arreglo de lista de los arcos, inArc[i] contine la lista
     // de los arcos que cuyo destino es el nodo i
-  private List<Arc> inArcs[];
+    private List<Arc> inArcs[];
     // arreglo de lista de los arcos, outArc[i] contine la lista
     // de los arcos que cuyo fuente es el nodo i
-  private List<Arc> outArcs[];
+    private List<Arc> outArcs[];
 
-   /**
-    * Crea un DiGraphList con n nodos y sin arcos.
-    * @param n numero de nodos iniciales de grafo
-    */
-   public DiGraphList(int n) {
+    /**
+     * Crea un DiGraphList con n nodos y sin arcos.
+     * @param n numero de nodos iniciales de grafo
+     */
+    public DiGraphList(int n) {
+        inArcs = new List[n];
+        outArcs = new List[n];
+    }
 
-      inArcs = new List[n];
-      outArcs = new List[n];
-   }
+    /**
+     * Crea un DiGraphList a partir del contenido de un archivo
+     * @param fileName nombre del archivo
+     */
+    public DiGraphList(String fileName) throws FileNotFoundException {
+        BufferedReader inbuff = new BufferedReader(new FileReader(fileName));
+        try {
+            int k = 1;
+            String linea = "";
+            while (linea != null){
+                linea = inbuff.readLine();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(DiGraphList.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
-   /**
-    * Crea un DiGraphList a partir del contenido de un archivo
-    * @param fileName nombre del archivo
-    */
-   public DiGraphList(String fileName) {
+    /**
+     * Crea un DiGraphList a partir del DiGraph g
+     * @param g
+     */
+    public DiGraphList(DiGraph g) {
 
-   }
+    }
 
-   /**
-    * Crea un DiGraphList a partir del DiGraph g
-    * @param g
-    */
-   public DiGraphList(DiGraph g) {
-
-   }
-
-   @Override
-   public DiGraphList clone() {
+    @Override
+    public DiGraphList clone() {
       throw new UnsupportedOperationException("Not supported yet.");
-   }
+    }
 
     public void addNodes(int num) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -138,7 +152,7 @@ public class DiGraphList extends DiGraph {
      * calculada usando el algoritmo Roy-Warshal
      */
 
-    public DiGraph royWarshall() {
+    public DiGraph alcance() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

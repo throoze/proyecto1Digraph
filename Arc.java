@@ -3,8 +3,9 @@
  * grafo
  *
  * @author Les profs
- * @version 1.0
- * @since 1.6
+ * @author Victor De Ponte, 05-38087
+ * @author Karina Valera, 06-40414
+ * @version 2.0
  */
 
 public class Arc {
@@ -47,7 +48,7 @@ public class Arc {
     }
 
     /**
-     * Pertmite obtener el costo de un arco: de ir de archo fuente al arco
+     * Pertmite obtener el costo de un arco: de ir de arco fuente al arco
      * destino.
      *
      * @return costo del Arco.
@@ -64,6 +65,7 @@ public class Arc {
     public void setCost(double c) {
        cost = c;
     }
+
     /**
      * Retorna la representacion en String del Arc
      * 
@@ -72,5 +74,23 @@ public class Arc {
     @Override
     public String toString() {
        return "(" + src + ", "+ dst+")";
+    }
+
+    /**
+     * Devuelve la etiqueta del arco.
+     * @return La etiqueta del arco
+     * @since 2.0
+     */
+    public String getId() {
+        return this.id;
+    }
+
+    /**
+     * Permite establecer la etiqueta del arco {@code this}.
+     * @param s Nueva etiqueta para el arco.
+     * @since 2.0
+     */
+    public void setId(String s) {
+        this.id = s;
     }
 }

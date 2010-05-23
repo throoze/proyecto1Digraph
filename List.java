@@ -14,22 +14,23 @@ public interface List <E> {
      *
      * @param Elemento de tipo E, con el que se declaro el objeto
      * lista particular,
-     * @return true si el elemento fue insertado, false en caso contrario
+     * @return {@code true} si el elemento fue insertado, false en caso contrario
      */
     public boolean add(E element);
 
     /**
-     * Agrega <i>element</i> a la lista en la posicion <i>i</i>, si <i> &gt;
-     * que size() el elemento se agrega al final de lista.
+     * Agrega <i>element</i> a la lista en la posicion <i>i</i>, si 
+     * <i>i</i> &gt; que size() el elemento se agrega al final de lista.
      *
      * @param Elemento de tipo E, con el que se declaro el objeto
      * lista particular,
      * @return true si el elemento fue insertado, false en caso contrario
-     */public boolean add(int index, E element);
+     */
+    public boolean add(int index, E element);
 
     /**
-     * Elimina todos los elementos de la lista. La lista debe quedar como recien creada.
-     *
+     * Elimina todos los elementos de la lista. La lista debe quedar como recien
+     * creada.
      */
     public void clear();
 
@@ -43,7 +44,8 @@ public interface List <E> {
     public List clone();
 
     /**
-     * Determina si el objeto <i>o</i> esta contenidoe n la lista. {@code Object equals}
+     * Determina si el objeto <i>o</i> esta contenido en la lista.
+     * {@code Object equals}
      *
      * @see Object#equals
      */
@@ -54,8 +56,8 @@ public interface List <E> {
      *
      * @param la lista con la que se desea comparar
      * 
-     * @return true si las dos listas tienen el mismo tamaño y contienen los mismos
-     * objetos en el mismo orden. false en caso contrario
+     * @return true si las dos listas tienen el mismo tamaño y contienen los
+     * mismos objetos en el mismo orden. false en caso contrario
      *
      */
     public boolean equals(List<E> o);
@@ -87,7 +89,8 @@ public interface List <E> {
     /**
      * Elimina el elemento en la posicion index.
      *
-     * @param index la posicion del elemento a eliminar, 0 &le; index &lt; size()
+     * @param index la posicion del elemento a eliminar, 0 &le; index &lt;
+     * size()
      * @return el elemento eliminado, si no se elimino ningun elemento retorna
      * null
      */
@@ -97,7 +100,8 @@ public interface List <E> {
      * Elimina el elemento <i>o</i>.
      *
      * @param o el elemento a eliminar.
-     * @return true si el elemento existia y fue eliminado, false en caso contrario.
+     * @return true si el elemento existia y fue eliminado, false en caso
+     * contrario.
      * null
      */
     public boolean remove(Object o);
@@ -125,5 +129,4 @@ public interface List <E> {
      */
     @Override
     public String toString();
-
 }

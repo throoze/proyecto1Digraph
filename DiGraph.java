@@ -1,17 +1,16 @@
-/**
-   * DiGraph es una interfaz que determina los metodos basicos que debe tener un
-   * grafo dirigido independiente de su implementacion interna
-   *
-   * @author Les profs
-   * @version 1.0
-   * @since 1.6
-**/
-
 import java.io.IOException;
 
+/**
+ * DiGraph es una interfaz que determina los metodos basicos que debe tener un
+ * grafo dirigido independiente de su implementacion interna
+ *
+ * @author Les profs
+ * @version 1.0
+ * @since 1.6
+ **/
 public abstract class DiGraph {
-  protected int numNodes  = -1;
-  protected int numArcs = -1;
+    protected int numNodes  = -1;
+    protected int numArcs = -1;
 
     /**
      * Agrega un arco a este DiGraph
@@ -19,7 +18,6 @@ public abstract class DiGraph {
      * @param src nodo fuente del arco
      * @param dst nodo destino del arco
      * @return El arco agregado
-     *
      */
     public abstract Arc addArc(int src, int dst);
 
@@ -30,9 +28,7 @@ public abstract class DiGraph {
      * @param dst nodo destino del arco
      * @param costo del arco
      * @return El arco agregado
-     *
      */
-
     public abstract Arc addArc(int src, int dst, double costo);
 
     /**
@@ -40,7 +36,6 @@ public abstract class DiGraph {
      *
      * @param num numero de nodos a a gregar
      */
-
     public abstract void addNodes(int num);
 
 
@@ -49,7 +44,6 @@ public abstract class DiGraph {
      *
      * @param nodeIniId nodo fuente del arco a eliminar
      * @param nodeFinId nodo destino del arco a eliminar
-     *
      * @return arco eliminado, null en caso de que el arco no exista o no haya
      * sido eliminado
      */
@@ -59,6 +53,7 @@ public abstract class DiGraph {
      * Genera una copia de este DiGraph.
      * @return una copia de este DiGraph.
      */
+    @Override
     public abstract Object clone();
 
     /**
@@ -89,12 +84,12 @@ public abstract class DiGraph {
      */
     public abstract int getDegree(int nodeId);
 
-/**
+    /**
      * Retorna el grado interno de un nodo en este DiGraph.
      *
      * @param nodeId identificacion del nodo
-     * @return el grado interno del nodo nodeId en este Grafo, -1 si el nodo no se
-     * encuentra en el grafo
+     * @return el grado interno del nodo nodeId en este Grafo, -1 si el nodo no
+     * se encuentra en el grafo
      */
     public abstract int getInDegree(int nodeId);
 
@@ -167,6 +162,7 @@ public abstract class DiGraph {
      * false en caso contrario
      */
     public abstract boolean isArc(int src, int dst);
+
     /**
      * Carga en este DiGraph, el grafo contenido en el archivo
      * 
@@ -175,16 +171,14 @@ public abstract class DiGraph {
      * 
      * @throws java.io.IOException
      */
-
     public abstract void read(String fileName) throws  IOException;
 
     /**
-     * remieve todos los arcos de este grafo
+     * remueve todos los arcos de este grafo
      *
      * @return lista de arcos eliminados
      */
     public abstract List<Arc> removeAllArcs();
-
 
     /**
      * Invierte la direccion de un arco
@@ -214,7 +208,7 @@ public abstract class DiGraph {
      * @return un Digraph que es la clausura transitiva de este DiGraph
      * calculada usando el algoritmo Roy-Warshal
      */
-   public DiGraph royWarshall() {
+   public DiGraph alcance() {
        DiGraph ret = null;
 
        ret = (DiGraph) this.clone();
@@ -238,6 +232,7 @@ public abstract class DiGraph {
 
         return ret;
     }
+
     /**
      * Retorna la representacion en String de este DiGraph.
      * @return la representacion en String de este DiGraph.
@@ -246,7 +241,8 @@ public abstract class DiGraph {
     public abstract String toString();
 
     /**
-     * Escribe este DiGraph en un archivo en el formato establecido en el enunciado
+     * Escribe este DiGraph en un archivo en el formato establecido en el
+     * enunciado
      *
      * @param fileName nombre del archivo donde se escribira la representacion
      * del grafo
@@ -254,5 +250,4 @@ public abstract class DiGraph {
      * @throws java.io.IOException
      */
     public abstract void write(String fileName) throws IOException;
-
 }

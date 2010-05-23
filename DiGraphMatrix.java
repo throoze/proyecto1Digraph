@@ -15,40 +15,39 @@ import java.io.IOException;
 public class DiGraphMatrix extends DiGraph {
 
     // estructura de la matriz de adyacencias que se debe utilizar
-   private boolean matrix[][];
+    private boolean matrix[][];
 
-   /**
-    * Crea un DiGraphMatrix con n nodos y sin arcos
-    * @param n
-    */
-   public DiGraphMatrix(int n) {
-      matrix = new boolean[n][n];
-      numNodes = n;
-   }
+    /**
+     * Crea un DiGraphMatrix con n nodos y sin arcos
+     * @param n
+     */
+    public DiGraphMatrix(int n) {
+       matrix = new boolean[n][n];
+       numNodes = n;
+    }
 
-   /**
-    * Crea un DiGraphMatrix a partir del contenido del archivo.
-    *
-    * @param fileName nombre del archivo
-    */
-   
-   public DiGraphMatrix(String fileName) {
+    /**
+     * Crea un DiGraphMatrix a partir del contenido del archivo.
+     *
+     * @param fileName nombre del archivo
+     */
+    public DiGraphMatrix(String fileName) {
+        
+    }
 
-   }
+    /**
+     * Crea un DiGraphMatrix a partir del DiGraph g
+     *
+     * @param g el grafo fuente.
+     */
+    public DiGraphMatrix(DiGraph g) {
 
-   /**
-    * Crea un DiGraphMatrix a partir del DiGraph g
-    * 
-    * @param g el grafo fuente.
-    */
-   public DiGraphMatrix(DiGraph g) {
+    }
 
-   }
-
-   @Override
-   public DiGraphMatrix clone() {
-      throw new UnsupportedOperationException("Not supported yet.");
-   }
+    @Override
+    public DiGraphMatrix clone() {
+       throw new UnsupportedOperationException("Not supported yet.");
+    }
 
     public void addNodes(int num) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -137,8 +136,8 @@ public class DiGraphMatrix extends DiGraph {
      * @return un Digraph que es la clausura transitiva de este DiGraph
      * calculada usando el algoritmo Roy-Warshal
      */
-
-    public DiGraph royWarshall() {
+    @Override
+    public DiGraph alcance() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

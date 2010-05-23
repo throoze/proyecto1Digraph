@@ -1,8 +1,9 @@
+import java.io.IOException;
 /**
  *
  * @author victor
  */
-public class ExcepcionFormatoIncorrecto extends Exception {
+public class ExcepcionFormatoIncorrecto extends IOException {
 
     /**
      * Creates a new instance of <code>ExcepcionFormatoIncorrecto</code> without detail message.

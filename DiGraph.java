@@ -71,7 +71,7 @@ public abstract class DiGraph {
      * @param nodoSrc nodo fuente
      * @param nodoDst nodo destino
      *
-     * @return lista de sucesores de nodeId
+     * @return Arco que va desde {@code nodoSrc} hasta {@code nodoDst}
      */
     public abstract Arc getArc(int nodoSrc, int nodoDst);
 

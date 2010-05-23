@@ -149,6 +149,21 @@ public class Lista<E> implements List<E>{
         return s;
     }
 
+    public Lista<E> concat(Lista<E> lista) {
+        Lista<E> laux = new Lista();
+        Nodo aux = this.head;
+        while (aux != null) {
+            laux.add((E)aux.elem);
+            aux =  aux.next;
+        }
+        aux = lista.head;
+        while (aux != null) {
+            laux.add((E)aux.elem);
+            aux =  aux.next;
+        }
+        return laux;
+    }
+
     private class Nodo <E>{
         public E elem;
         public Nodo next;

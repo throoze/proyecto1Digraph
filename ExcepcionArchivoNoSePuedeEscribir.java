@@ -1,4 +1,5 @@
-public class ExcepcionArchivoNoSePuedeEscribir extends Exception{
+import java.io.IOException;
+public class ExcepcionArchivoNoSePuedeEscribir extends IOException {
 
     public ExcepcionArchivoNoSePuedeEscribir(){
         super();

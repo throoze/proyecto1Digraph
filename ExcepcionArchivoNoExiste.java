@@ -1,4 +1,5 @@
-public class ExcepcionArchivoNoExiste extends Exception {
+import java.io.IOException;
+public class ExcepcionArchivoNoExiste extends IOException {
 
     public ExcepcionArchivoNoExiste(){
         super();

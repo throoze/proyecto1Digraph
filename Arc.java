@@ -9,6 +9,7 @@
  */
 
 public class Arc {
+    
     private String id = "";
     private double cost;
     private int src = -1;

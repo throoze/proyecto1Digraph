@@ -85,13 +85,12 @@ public class DiGraphList extends DiGraph {
                      */
                     this.inArcs = new List[new Integer(tokens[0]).intValue()];
                     this.outArcs = new List[new Integer(tokens[0]).intValue()];
-                    /* HASTA AQUI SOLO SE HAN INICIALIZADO LOS ARREGLOS DE
-                     * LISTAS. FALTA LLENAR EL GRAFO. CREO QUE ES MEJOR HACER
-                     * OTRO METODO PARA ESO Y LLAMARLO DESDE AQUI.
-                     */
                     /* Fin de las diferencias en este constructor entre
                      * DiGraphList y DiGraphMatrix
                      */
+                    this.numNodes = new Integer(tokens[0]).intValue();
+                    this.numArcs = new Integer(tokens[1]).intValue();
+                    this.fillFromFile(inbuff, fileName);
                 } else {
                     throw new ExcepcionFormatoIncorrecto("En la primera linea" +
                             " hay un error de sintaxis: Se esperaba un numero" +
@@ -114,6 +113,49 @@ public class DiGraphList extends DiGraph {
             throw new ExcepcionArchivoNoSePuedeLeer("Problema al leer el ar" +
                     "chivo \"" + fileName +"\": ESTE ARCHIVO NO SE PUEDE" +
                     " LEER!!!");
+        }
+    }
+
+    private void fillFromFile(BufferedReader inbuff, String fileName)
+                                        throws ExcepcionArchivoNoSePuedeLeer,
+                                               ExcepcionFormatoIncorrecto
+    {
+        String linea = "";
+        String[] tokens;
+        int k = 2;
+        while (linea != null) {
+            try {
+                linea = inbuff.readLine();
+            } catch (IOException ioe) {
+                System.out.println("Esto no deberia pasar, contacte"
+                        + " al programador...");
+                System.out.println("MENSAJE:" + ioe.getMessage() + "\n"
+                        + "CAUSA:" + ioe.getCause().toString() + "\n");
+                throw new ExcepcionArchivoNoSePuedeLeer("Problema Leyendo la"
+                        + "linea " + k + " del archivo \"" + fileName
+                        + "\"");
+            }
+            tokens = linea.split(" ");
+            if (tokens.length == 2) {
+                if (tokens[0].matches("[0-9]+?") &&
+                    tokens[1].matches("[0-9]+?")) {
+                    this.addArc(new Integer(tokens[0]).intValue(),
+                                new Integer(tokens[1]).intValue());
+                } else {
+                    throw new ExcepcionFormatoIncorrecto("En la linea " + k +
+                            " del archivo \"" + fileName + "\"" +
+                            " hay un error de sintaxis: Se esperaba un numero" +
+                            " seguido de otro numero (numNodos numArcos) y se" +
+                            " encontro: " + tokens[0] + " " + tokens[1] + "\n");
+                }
+            } else {
+                throw new ExcepcionFormatoIncorrecto("En la linea " + k +
+                            " del archivo \"" + fileName + "\" hay " +
+                        "un error de sintaxis: Se esperaban dos elementos (" +
+                        "numNodos numArcos), y se encontro:\n\t"+
+                        tokens.toString());
+            }
+            k++;
         }
     }
 

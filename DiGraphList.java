@@ -5,8 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * DiGraphList es una clase concreta que ud debe implementar
@@ -29,6 +27,8 @@ public class DiGraphList extends DiGraph {
     public DiGraphList() {
         this.inArcs = null;
         this.outArcs = null;
+        this.numArcs = -1;
+        this.numNodes = -1;
     }
 
     /**
@@ -164,16 +164,35 @@ public class DiGraphList extends DiGraph {
      * @param g
      */
     public DiGraphList(DiGraph g) {
-
+        this.inArcs = new List[g.numNodes];
+        this.outArcs = new List[g.numNodes];
+        this.numNodes = g.numNodes;
+        this.numArcs = g.numArcs;
+        for (int i = 0; i < this.numNodes; i++) {
+            for  (int j = 0; j < this.numNodes; j++) {
+                if (g.isArc(i, j)) {
+                    this.addArc(i, j);
+                }
+            }
+        }
     }
 
     @Override
     public DiGraphList clone() {
-      throw new UnsupportedOperationException("Not supported yet.");
+        DiGraphList nuevo = new DiGraphList(this);
+        return nuevo;
     }
 
     public void addNodes(int num) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        List<Arc>[] arcosDeEntrada = new List[this.numNodes + num];
+        List<Arc>[] arcosDeSalida = new List[this.numNodes + num];
+        for (int k = 0; k < this.numNodes; k++) {
+            arcosDeEntrada[k] = this.inArcs[k];
+            arcosDeSalida[k] = this.outArcs[k];
+        }
+        this.numNodes = this.numNodes + num;
+        this.inArcs = arcosDeEntrada;
+        this.outArcs = arcosDeSalida;
     }
 
     public Arc addArc(int src, int dst) {

@@ -3,7 +3,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 
 /**
@@ -23,6 +22,8 @@ public class DiGraphList extends DiGraph {
     // arreglo de lista de los arcos, outArc[i] contine la lista
     // de los arcos que cuyo fuente es el nodo i
     private List<Arc> outArcs[];
+
+    // Constructores:
 
     public DiGraphList() {
         this.inArcs = null;
@@ -49,49 +50,6 @@ public class DiGraphList extends DiGraph {
         this.read(fileName);
     }
 
-    private void fillFromFile(BufferedReader inbuff, String fileName)
-                                        throws ExcepcionArchivoNoSePuedeLeer,
-                                               ExcepcionFormatoIncorrecto
-    {
-        String linea = "";
-        String[] tokens;
-        int k = 2;
-        while (linea != null) {
-            try {
-                linea = inbuff.readLine();
-            } catch (IOException ioe) {
-                System.out.println("Esto no deberia pasar, contacte"
-                        + " al programador...");
-                System.out.println("MENSAJE:" + ioe.getMessage() + "\n"
-                        + "CAUSA:" + ioe.getCause().toString() + "\n");
-                throw new ExcepcionArchivoNoSePuedeLeer("Problema Leyendo la"
-                        + "linea " + k + " del archivo \"" + fileName
-                        + "\"");
-            }
-            tokens = linea.split(" ");
-            if (tokens.length == 2) {
-                if (tokens[0].matches("[0-9]+?") &&
-                    tokens[1].matches("[0-9]+?")) {
-                    this.addArc(new Integer(tokens[0]).intValue(),
-                                new Integer(tokens[1]).intValue());
-                } else {
-                    throw new ExcepcionFormatoIncorrecto("En la linea " + k +
-                            " del archivo \"" + fileName + "\"" +
-                            " hay un error de sintaxis: Se esperaba un numero" +
-                            " seguido de otro numero (numNodos numArcos) y se" +
-                            " encontro: " + tokens[0] + " " + tokens[1] + "\n");
-                }
-            } else {
-                throw new ExcepcionFormatoIncorrecto("En la linea " + k +
-                            " del archivo \"" + fileName + "\" hay " +
-                        "un error de sintaxis: Se esperaban dos elementos (" +
-                        "numNodos numArcos), y se encontro:\n\t"+
-                        tokens.toString());
-            }
-            k++;
-        }
-    }
-
     /**
      * Crea un DiGraphList a partir del DiGraph g
      * @param g
@@ -110,11 +68,7 @@ public class DiGraphList extends DiGraph {
         }
     }
 
-    @Override
-    public DiGraphList clone() {
-        DiGraphList nuevo = new DiGraphList(this);
-        return nuevo;
-    }
+    // Métodos:
 
     public void addNodes(int num) {
         List<Arc>[] arcosDeEntrada = new List[this.numNodes + num];
@@ -146,6 +100,79 @@ public class DiGraphList extends DiGraph {
         return (nuevo);
     }
 
+    /**
+     * Retorna un Digraph que es la clausura transitiva de este DiGraph
+     * calculada usando el algoritmo Roy-Warshal
+     *
+     * @return un Digraph que es la clausura transitiva de este DiGraph
+     * calculada usando el algoritmo Roy-Warshal
+     */
+    @Override
+    public DiGraph alcance() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public DiGraphList clone() {
+        DiGraphList nuevo = new DiGraphList(this);
+        return nuevo;
+    }
+
+    public Arc delArc(int nodeIniId, int nodeFinId) {
+        Arc arco = new Arc(nodeIniId,nodeFinId);
+        this.inArcs[nodeFinId].remove(arco);
+        this.outArcs[nodeIniId].remove(arco);
+        return arco;
+    }
+
+    public boolean equals(DiGraph g) {
+        if (this.numArcs == g.numArcs && this.numNodes == g.numNodes) {
+            boolean out = true;
+            for (int i = 0; i < this.numNodes && out; i++) {
+                Arc[] arrArcs = (Arc[])this.outArcs[i].toArray();
+                for (int j = 0; j < arrArcs.length; j++) {
+                    out = g.isArc(i, arrArcs[j].getDst());
+                }
+            }
+            return out;
+        } else {
+            return false;
+        }
+    }
+
+    // preguntar si es asi...
+    public Arc getArc(int nodoSrc, int nodoDst) {
+        return new Arc(nodoSrc,nodoDst);
+    }
+
+    public int getDegree(int nodeId) {
+        return this.getInDegree(nodeId) + this.getOutDegree(nodeId);
+    }
+
+    public int getInDegree(int nodeId) {
+        return this.inArcs[nodeId].size();
+    }
+
+    public List<Arc> getInEdges(int nodeId) {
+        return this.inArcs[nodeId];
+    }
+
+    public int getNumberOfArcs() {
+        return this.numArcs;
+    }
+
+    public int getNumberOfNodes() {
+        return this.numNodes;
+    }
+
+    public int getOutDegree(int nodeId) {
+        return this.outArcs[nodeId].size();
+    }
+
+    public List<Arc> getOutEdges(int nodeId) {
+        return this.outArcs[nodeId];
+    }
+
     public List<Integer> getPredecesors(int nodeId) {
         List<Integer> predecesors = new Lista();
         Arc[] arrArcs = (Arc[])this.inArcs[nodeId].toArray();
@@ -164,9 +191,9 @@ public class DiGraphList extends DiGraph {
         return sucesors;
     }
 
-    // preguntar si es asi...
-    public Arc getArc(int nodoSrc, int nodoDst) {
-        return new Arc(nodoSrc,nodoDst);
+    @Override
+    public boolean isArc(int src, int dst) {
+        return (this.outArcs[src].contains(new Arc(src,dst)));
     }
 
     public void read(String fileName) throws IOException {
@@ -237,6 +264,50 @@ public class DiGraphList extends DiGraph {
         }
     }
 
+    public List<Arc> removeAllArcs() {
+        List<Arc> lista = new Lista();
+        for (int i = 0; i < this.numNodes; i++) {
+            Arc[] arrArcs = (Arc[])this.outArcs[i].toArray();
+            for (int j = 0; j < arrArcs.length; j++) {
+                lista.add(arrArcs[j]);
+            }
+        }
+        this.inArcs = new List[this.numNodes];
+        this.outArcs = new List[this.numNodes];
+        return lista;
+    }
+
+    public boolean reverseArc(int nodeIniId, int nodeFinId) {
+        if (this.isArc(nodeIniId, nodeFinId)) {
+            this.delArc(nodeIniId, nodeFinId);
+            this.addArc(nodeFinId, nodeIniId);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean reverseArcs() {
+        List<Arc> arcos = this.removeAllArcs();
+        while (!arcos.isEmpty()) {
+            Arc arco = arcos.remove(0);
+            this.addArc(arco.getDst(), arco.getSrc());
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        String string = "Numero de NODOS: " + this.numNodes + "\n" +
+                "Numero de ARCOS: " + this.numArcs + "\n ARCOS:\n";
+        for (int i = 0; i < this.numNodes; i++) {
+            for (int j = 0; j < this.outArcs[i].size(); j++) {
+                string = string + this.outArcs[i].get(j).toString() + "\n";
+            }
+        }
+        return string;
+    }
+
     public void write(String fileName) throws IOException {
         if ((new File(fileName)).exists() &&
             (new File(fileName)).isFile() &&
@@ -247,10 +318,14 @@ public class DiGraphList extends DiGraph {
                 out = new PrintStream(fileName);
                 out.println(this.numNodes + " " + this.numArcs);
                 for (int i = 0; i < this.numNodes; i++) {
+                    /* A partir de aqui es diferente entre DiGraphList y
+                     * DiGraphMatrix
+                     */
                     Arc[] arrArcs = (Arc[])this.outArcs[i].toArray();
                     for (int j = 0; j < arrArcs.length; j++) {
                         out.println(i + " " + arrArcs[j].getDst());
                     }
+                    // Fin de las diferencias
                 }
             } catch (FileNotFoundException fnfe) {
                 System.out.println("Esto no deberia pasar, contacte" +
@@ -273,93 +348,48 @@ public class DiGraphList extends DiGraph {
         }
     }
 
-    public int getDegree(int nodeId) {
-        return this.getInDegree(nodeId) + this.getOutDegree(nodeId);
-    }
+    // METODOS PRIVADOR AUXILIARES:
 
-    public int getOutDegree(int nodeId) {
-        return this.outArcs[nodeId].size();
-    }
-
-    public int getInDegree(int nodeId) {
-        return this.inArcs[nodeId].size();
-    }
-
-    public int getNumberOfNodes() {
-        return this.numNodes;
-    }
-
-    public int getNumberOfArcs() {
-        return this.numArcs;
-    }
-
-    public List<Arc> getOutEdges(int nodeId) {
-        return this.outArcs[nodeId];
-    }
-
-    public List<Arc> getInEdges(int nodeId) {
-        return this.inArcs[nodeId];
-    }
-
-    public Arc delArc(int nodeIniId, int nodeFinId) {
-        Arc arco = new Arc(nodeIniId,nodeFinId);
-        this.inArcs[nodeFinId].remove(arco);
-        this.outArcs[nodeIniId].remove(arco);
-        return arco;
-    }
-
-    public List<Arc> removeAllArcs() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean reverseArc(int nodeIniId, int nodeFinId) {
-        if (this.isArc(nodeIniId, nodeFinId)) {
-            this.delArc(nodeIniId, nodeFinId);
-            this.addArc(nodeFinId, nodeIniId);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean reverseArcs() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean equals(DiGraph g) {
-        if (this.numArcs == g.numArcs && this.numNodes == g.numNodes) {
-            boolean out = true;
-            for (int i = 0; i < this.numNodes && out; i++) {
-                Arc[] arrArcs = (Arc[])this.outArcs[i].toArray();
-                for (int j = 0; j < arrArcs.length; j++) {
-                    out = g.isArc(i, arrArcs[j].getDst());
-                }
+    private void fillFromFile(BufferedReader inbuff, String fileName)
+                                        throws ExcepcionArchivoNoSePuedeLeer,
+                                               ExcepcionFormatoIncorrecto
+    {
+        String linea = "";
+        String[] tokens;
+        int k = 2;
+        while (linea != null) {
+            try {
+                linea = inbuff.readLine();
+            } catch (IOException ioe) {
+                System.out.println("Esto no deberia pasar, contacte"
+                        + " al programador...");
+                System.out.println("MENSAJE:" + ioe.getMessage() + "\n"
+                        + "CAUSA:" + ioe.getCause().toString() + "\n");
+                throw new ExcepcionArchivoNoSePuedeLeer("Problema Leyendo la"
+                        + "linea " + k + " del archivo \"" + fileName
+                        + "\"");
             }
-            return out;
-        } else {
-            return false;
+            tokens = linea.split(" ");
+            if (tokens.length == 2) {
+                if (tokens[0].matches("[0-9]+?") &&
+                    tokens[1].matches("[0-9]+?")) {
+                    this.addArc(new Integer(tokens[0]).intValue(),
+                                new Integer(tokens[1]).intValue());
+                } else {
+                    throw new ExcepcionFormatoIncorrecto("En la linea " + k +
+                            " del archivo \"" + fileName + "\"" +
+                            " hay un error de sintaxis: Se esperaba un numero" +
+                            " seguido de otro numero (numNodos numArcos) y se" +
+                            " encontro: " + tokens[0] + " " + tokens[1] + "\n");
+                }
+            } else {
+                throw new ExcepcionFormatoIncorrecto("En la linea " + k +
+                            " del archivo \"" + fileName + "\" hay " +
+                        "un error de sintaxis: Se esperaban dos elementos (" +
+                        "numNodos numArcos), y se encontro:\n\t"+
+                        tokens.toString());
+            }
+            k++;
         }
-    }
-
-    /**
-     * Retorna un Digraph que es la clausura transitiva de este DiGraph
-     * calculada usando el algoritmo Roy-Warshal
-     * 
-     * @return un Digraph que es la clausura transitiva de este DiGraph
-     * calculada usando el algoritmo Roy-Warshal
-     */
-    @Override
-    public DiGraph alcance() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String toString() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean isArc(int src, int dst) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -61,8 +61,14 @@ public class Arc {
      * @param a Arc con el que se desea comparar.
      * @return true si los fuentes y destinos de los dos arcos son iguales.
      */
-    public boolean equals(Arc a) {
-       return src == a.src && dst == a.dst;
+    @Override
+    public boolean equals(Object a) {
+       if (a instanceof Arc) {
+           Arc nuevo = (Arc) a;
+           return (this.dst == nuevo.dst && this.src == nuevo.src);
+       } else {
+           return false;
+       }
     }
 
     /**

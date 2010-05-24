@@ -109,7 +109,28 @@ public class DiGraphList extends DiGraph {
      */
     @Override
     public DiGraph alcance() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        DiGraphList salida = this.clone();
+        for (int i = 0; i < salida.numNodes; i++) {
+            salida.addArc(i, i);
+        }
+        int flag;
+        do {
+            boolean stop = false;
+            flag = this.numArcs;
+            for (int a = 0; a < salida.numNodes && !stop; a++) {
+                for (int i = 0; i < salida.outArcs[a].size() && !stop; i++) {
+                    int b = salida.outArcs[a].get(i).getDst();
+                    for (int j = 0; j < salida.outArcs[b].size() && !stop; j++){
+                        int c = salida.outArcs[b].get(j).getDst();
+                        if (!salida.isArc(a, c)) {
+                            salida.addArc(a, c);
+                            stop = true;
+                        }
+                    }
+                }
+            }
+        } while (salida.numArcs > flag);
+        return salida;
     }
 
     @Override
@@ -302,7 +323,7 @@ public class DiGraphList extends DiGraph {
                 "Numero de ARCOS: " + this.numArcs + "\n ARCOS:\n";
         for (int i = 0; i < this.numNodes; i++) {
             for (int j = 0; j < this.outArcs[i].size(); j++) {
-                string = string + this.outArcs[i].get(j).toString() + "\n";
+                string += this.outArcs[i].get(j).toString() + "\n";
             }
         }
         return string;

@@ -1,52 +1,47 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+
 /** * DiGraphMatrix es una clase concreta que ud debe implementar
  *
  * @author Les profs
  * @version 1.0
  * @since 1.6
 **/
-
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-
-/**
- *
- * @author eduardo
- */
 public class DiGraphMatrix extends DiGraph {
 
     // estructura de la matriz de adyacencias que se debe utilizar
-   private boolean matrix[][];
-
-   /**
-    * Crea un DiGraphMatrix con n nodos y sin arcos
-    * @param n
-    */
-   public DiGraphMatrix(int n) {
-      matrix = new boolean[n][n];
-      numNodes = n;
-   }
-
-   /**
-    * Crea un DiGraphMatrix a partir del contenido del archivo.
-    *
-    * @param fileName nombre del archivo
-    */
-   public DiGraphMatrix(String fileName) throws IOException {
+    private boolean matrix[][];
+    
+    // Constructores:
+    
+    /**
+     * Crea un DiGraphMatrix con n nodos y sin arcos
+     * @param n
+     */
+    public DiGraphMatrix(int n) {
+        matrix = new boolean[n][n];
+        numNodes = n;
+    }
+    
+    /**
+     * Crea un DiGraphMatrix a partir del contenido del archivo.
+     *
+     * @param fileName nombre del archivo
+     */
+    public DiGraphMatrix(String fileName) throws IOException {
         this.read(fileName);
-   }
-   
-   /**
-    * Crea un DiGraphMatrix a partir del DiGraph g
-    * 
-    * @param g el grafo fuente.
-    */
-   public DiGraphMatrix(DiGraph g) {
+    }
+    
+    /**
+     * Crea un DiGraphMatrix a partir del DiGraph g
+     * 
+     * @param g el grafo fuente.
+     */
+    public DiGraphMatrix(DiGraph g) {
      this.matrix = new boolean [g.numNodes][g.numNodes];
      for (int i = 0; i < this.numNodes; i++) {
          for (int j=0; j< this.numNodes; j++){
@@ -58,11 +53,16 @@ public class DiGraphMatrix extends DiGraph {
 
    }
 
+    public Arc addArc(int src, int dst) {
+        this.matrix[src][dst] = true;
+        Arc arco = new Arc(src,dst);
+	return arco;
+    }
 
-    @Override
-    public DiGraphMatrix clone() {
-       DiGraphMatrix nuevo = new DiGraphMatrix(this);
-       return nuevo;
+    public Arc addArc(int src, int dst, double costo) {
+        this.matrix[src][dst] = true;
+        Arc arco = new Arc(src,dst,costo);
+	return arco;
     }
 
     @Override
@@ -77,16 +77,119 @@ public class DiGraphMatrix extends DiGraph {
         }
     }
 
-    public Arc addArc(int src, int dst) {
-        this.matrix[src][dst] = true;
-        Arc arco = new Arc(src,dst);
-	return arco;
+    /**
+     * Retorna un Digraph que es la clausura transitiva de este DiGraph
+     * calculada usando el algoritmo Roy-Warshal
+     *
+     * @return un Digraph que es la clausura transitiva de este DiGraph
+     * calculada usando el algoritmo Roy-Warshal
+     */
+    @Override
+    public DiGraph alcance() {
+        DiGraphMatrix nuevo = new DiGraphMatrix(this.numNodes);
+        // Se trabaja sobre una copia, para no modificar el original
+        copy_matrix(this.matrix,nuevo.matrix);
+        // Añadimos la diagonal principal...
+        for (int i = 0; i < this.numNodes; i++){
+            nuevo.matrix[i][i] = true;
+        }
+        // Se calculan los demás arcos transitivos
+        for (int i = 0; i < this.numNodes; i++){
+            for (int j = 0; j < this.numNodes; j++){
+	        if (nuevo.matrix[i][j] && i != j){
+	            for (int k = 0; k < this.numNodes; k++){
+	                nuevo.matrix[i][k] =
+                                (nuevo.matrix[i][k] || nuevo.matrix[j][k]);
+		    }
+	        }
+	    }
+        }
+        return nuevo;
+
     }
 
-    public Arc addArc(int src, int dst, double costo) {
-        this.matrix[src][dst] = true;
-        Arc arco = new Arc(src,dst,costo);
+    @Override
+    public DiGraphMatrix clone() {
+       DiGraphMatrix nuevo = new DiGraphMatrix(this);
+       return nuevo;
+    }
+
+    public Arc delArc(int nodeIniId, int nodeFinId) {
+        Arc arco = new Arc(nodeIniId,nodeFinId);
+        this.matrix[nodeIniId][nodeFinId] = false;
 	return arco;
+    }
+    
+    @Override
+    public boolean equals(DiGraph g) {
+        boolean eq = true;
+        for(int i = 0; i < this.numNodes && eq; i++) {
+	    for(int j = 0; j < this.numNodes && eq; j++) {
+                if (this.matrix[i][j] != ((DiGraphMatrix)g).matrix[i][j]) {
+                    eq = false;
+		}
+            }
+        }
+        return eq;
+    }
+    
+    public Arc getArc(int nodoSrc, int nodoDst) {
+        return new Arc(nodoSrc,nodoDst);
+    }
+    
+    public int getDegree(int nodeId) {
+        return this.getInDegree(nodeId) + this.getOutDegree(nodeId);
+    }
+    
+    public int getInDegree(int nodeId) {
+        int k = 0;
+        for(int i=0; i<this.numNodes;i++){
+            if(this.matrix[i][nodeId] == true ){
+                k++;
+            }
+	}
+	return k;
+    }
+    
+    @Override
+    public List<Arc> getInEdges(int nodeId) {
+        List<Arc> arcos = new Lista();
+        for (int k = 0; k < this.numNodes; k++) {
+            if(this.matrix [k][nodeId]== true){
+                arcos.add(new Arc (k, nodeId));
+            }
+        }
+        return arcos;
+    }
+    
+    public int getNumberOfArcs() {
+        return this.numArcs;
+    }
+    
+    public int getNumberOfNodes() {
+        return this.numNodes;
+    }
+
+    public int getOutDegree(int nodeId) {
+
+    int k = 0;
+    for(int i=0; i<numNodes;i++){
+	 if(this.matrix[nodeId][i] == true ){
+	   k++;
+	   }
+	 }
+	 return k;
+   }
+
+    @Override
+    public List<Arc> getOutEdges(int nodeId) {
+        List<Arc> arcos = new Lista();
+        for (int k = 0; k < this.numNodes; k++) {
+            if(this.matrix [nodeId][k]== true){
+                arcos.add(new Arc (nodeId, k));
+            }
+        }
+        return arcos;
     }
 
     public List<Integer> getPredecesors(int nodeId) {
@@ -109,9 +212,9 @@ public class DiGraphMatrix extends DiGraph {
         return sucesors;
     }
 
-
-    public Arc getArc(int nodoSrc, int nodoDst) {
-        return new Arc(nodoSrc,nodoDst);
+    @Override
+    public boolean isArc(int src, int dst) {
+        return this.matrix[src][dst];
     }
 
     public void read(String fileName) throws IOException {
@@ -183,6 +286,56 @@ public class DiGraphMatrix extends DiGraph {
         }
     }
 
+    @Override
+    public List<Arc> removeAllArcs() {
+        List<Arc> lista = new Lista();
+        for (int i = 0; i < this.numNodes; i++) {
+            for (int j = 0; j < this.numNodes; j++) {
+                if(this.matrix[i][j]){
+                    this.matrix[i][j]= false;
+                    lista.add(new Arc (i, j));
+                }
+            }
+        }
+        return lista;
+    }
+
+    public boolean reverseArc(int nodeIniId, int nodeFinId) {
+        if(this.matrix[nodeIniId][nodeFinId]){
+            this.matrix[nodeIniId][nodeFinId] = false;
+            this.matrix[nodeFinId][nodeIniId] = true;
+            return true;
+	} else {
+            return false;
+        }
+    }
+
+    public boolean reverseArcs() {
+        boolean[][] nueva = new boolean[this.numNodes][this.numNodes];
+        for(int i = 0; i < this.numNodes; i++) {
+            for(int j = 0; j < this.numNodes; j++) {
+                if(this.matrix[i][j]) {
+                    this.matrix[i][j] = false;
+		    nueva[j][i] = true;
+		}
+            }
+	}
+        this.matrix = nueva;
+	return true;
+    }
+
+    @Override
+    public String toString() {
+        String string = "Numero de NODOS: " + this.numNodes + "\n" +
+                "Numero de ARCOS: " + this.numArcs + "\n ARCOS:\n";
+        for( int i = 0; i < this.numNodes; ++i ) {
+            for( int j = 0; j < this.numNodes; ++j ) {
+                string += matrix[i][j] ? "(" + i + ", " + j +")\n" : "";
+	    }
+	}
+	return string;
+    }
+
     public void write(String fileName) throws IOException {
         if ((new File(fileName)).exists() &&
             (new File(fileName)).isFile() &&
@@ -222,142 +375,6 @@ public class DiGraphMatrix extends DiGraph {
                     "archivo \"" + fileName +"\": ESTE ARCHIVO NO SE PUEDE" +
                     " LEER!!!");
         }
-    }
-
-
-    public int getDegree(int nodeId) {
-        return this.getInDegree(nodeId) + this.getOutDegree(nodeId);
-    }
-
-    public int getOutDegree(int nodeId) {
-    
-    int k = 0;
-    for(int i=0; i<numNodes;i++){
-	 if(this.matrix[nodeId][i] == true ){
-	   k++;
-	   }
-	 }
-	 return k;
-   }
-    
-   public int getInDegree(int nodeId) {
-    
-    int k = 0;
-    for(int i=0; i<this.numNodes;i++){
-
-	 if(this.matrix[i][nodeId] == true ){
-
-	  k++;
-	   }
-	 }
-	 return k;
-    }
-
-    public int getNumberOfNodes() {
-        return this.numNodes;
-    }
-
-    public int getNumberOfArcs() {
-        return this.numArcs;
-    }
-
-    public Arc delArc(int nodeIniId, int nodeFinId) {
-        Arc arco = new Arc(nodeIniId,nodeFinId);
-        this.matrix[nodeIniId][nodeFinId] = false;
-	return arco;
-    }
-
-    public boolean reverseArc(int nodeIniId, int nodeFinId) {
-        if(this.matrix[nodeIniId][nodeFinId]){
-            this.matrix[nodeIniId][nodeFinId] = false;
-            this.matrix[nodeFinId][nodeIniId] = true;
-            return true;
-	} else {
-            return false;
-        }
-    }
-
-    public boolean reverseArcs() {
-        boolean[][] nueva = new boolean[this.numNodes][this.numNodes];
-        for(int i = 0; i < this.numNodes; i++) {
-            for(int j = 0; j < this.numNodes; j++) {
-                if(this.matrix[i][j]) {
-                    this.matrix[i][j] = false;
-		    nueva[j][i] = true;
-		}
-            }
-	}
-        this.matrix = nueva;
-	return true;
-    }
-    
-    @Override
-    public boolean equals(DiGraph g) {
-        boolean eq = true;
-        for(int i = 0; i < this.numNodes && eq; i++) {
-	    for(int j = 0; j < this.numNodes && eq; j++) {
-                if (this.matrix[i][j] != ((DiGraphMatrix)g).matrix[i][j]) {
-                    eq = false;
-		}
-            }
-        }
-        return eq;
-    }
-    
-    /**
-     * Retorna un Digraph que es la clausura transitiva de este DiGraph
-     * calculada usando el algoritmo Roy-Warshal
-     *
-     * @return un Digraph que es la clausura transitiva de este DiGraph
-     * calculada usando el algoritmo Roy-Warshal
-     */
-    @Override
-    public DiGraph alcance() {
-        DiGraphMatrix nuevo = new DiGraphMatrix(this.numNodes);
-        // Se trabaja sobre una copia, para no modificar el original
-        copy_matrix(this.matrix,nuevo.matrix);
-        // Añadimos la diagonal principal...
-        for (int i = 0; i < this.numNodes; i++){
-            nuevo.matrix[i][i] = true;
-        }
-        // Se calculan los demás arcos transitivos
-        for (int i = 0; i < this.numNodes; i++){
-            for (int j = 0; j < this.numNodes; j++){
-	        if (nuevo.matrix[i][j] && i != j){
-	            for (int k = 0; k < this.numNodes; k++){
-	                nuevo.matrix[i][k] =
-                                (nuevo.matrix[i][k] || nuevo.matrix[j][k]);
-		    }
-	        }
-	    }
-        }
-        return nuevo;
-
-    }
-
-    @Override
-    public String toString() {
-       throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean isArc(int src, int dst) {
-        return this.matrix[src][dst];
-    }
-
-    @Override
-    public List<Arc> getInEdges(int nodeId) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public List<Arc> getOutEdges(int nodeId) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public List<Arc> removeAllArcs() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     // METODOS PRIVADOS AUXILIARES:

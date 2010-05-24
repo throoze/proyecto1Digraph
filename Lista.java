@@ -7,46 +7,62 @@ public class Lista<E> implements List<E>{
 
     private Nodo head;
     private Nodo tail;
+    private int  tam;
 
     public Lista() {
         this.head = new Nodo();
-        this.tail = this.head.next;
+        this.tail = this.head;
+        this.tam = 0;
     }
 
     public boolean add(E element) {
-        Nodo nuevo = new Nodo(this.tail,element);
-        this.tail.next = nuevo;
+        if (this.isEmpty()) {
+            this.head.next = new Nodo(this.head,element);
+            this.head.prev = null;
+            this.tail = head.next;
+        } else {
+            Nodo nuevo = new Nodo(this.tail,element);
+            this.tail.next = nuevo;
+        }
+        this.tam++;
         return true;
     }
 
     public boolean add(int index, E element) {
-        Nodo aux = this.head;
-        for (int k = 0; k <= index && aux.next != null; k++){
-            aux = aux.next;
-        }
-        if (aux.next != null) {
-            Nodo nuevo = new Nodo(aux.prev, element, aux.next);
-            aux.prev.next = nuevo;
-            aux.next.prev = nuevo;
+        if (index < this.size()) {
+            Nodo aux = this.head;
+            int k;
+            for (k = -1; k < index; k++) {
+                aux = aux.next;
+            }
+            if (aux.next != null) {
+                Nodo nuevo = new Nodo(aux, element, aux.next);
+                aux.next.prev = nuevo;
+                aux.next = nuevo;
+            } else {
+                Nodo nuevo = new Nodo(aux, element);
+                aux.next = nuevo;
+            }
+            tam++;
+            return true;
         } else {
-            Nodo nuevo = new Nodo(aux.prev, element);
-            aux.prev.next = nuevo;
+            return false;
         }
-        return true;
     }
 
     public void clear() {
         this.head = new Nodo();
-        this.tail = new Nodo();
+        this.tail = this.head;
+        this.tam = 0;
     }
 
     @Override
     public List clone() {
         List<E> laux = new Lista();
-        Nodo aux = this.head;
+        Nodo aux = this.head.next;
         while (aux != null) {
             laux.add((E)aux.elem);
-            aux =  aux.next;
+            aux = aux.next;
         }
         return laux;
     }
@@ -54,10 +70,10 @@ public class Lista<E> implements List<E>{
     public boolean contains(Object o) {
         Nodo aux = this.head;
         while (aux.next != null) {
-            if (aux.elem.equals(o)) {
+            aux =  aux.next;
+            if (aux.elem.equals((E)o)) {
                 return true;
             }
-            aux =  aux.next;
         }
         return false;
     }
@@ -77,14 +93,18 @@ public class Lista<E> implements List<E>{
     }
 
     public E get(int index) {
-        Object[] lista = this.toArray();
-        return (E) lista[index];
+        if (0 <= index && index < this.size()) {
+            Object[] lista = this.toArray();
+            return (E) lista[index];
+        } else {
+            return null;
+        }
     }
 
     public int indexOf(Object o) {
         Object[] lista = this.toArray();
         for ( int k = 0; k < lista.length; k++) {
-            if ( lista[k].equals(o) ) {
+            if ( lista[k].equals((E)o) ) {
                 return k;
             }
         }
@@ -97,37 +117,31 @@ public class Lista<E> implements List<E>{
 
     public E remove(int index) {
         Nodo aux = this.head;
-        for (int k = 0; k <= index && aux.next != null; k++){
+        for (int k = -1; k < index && aux.next != null; k++){
             aux = aux.next;
         }
         aux.prev.next = aux.next;
         aux.next.prev = aux.prev;
+        this.tam--;
         return (E) aux.elem;
     }
 
     public boolean remove(Object o) {
         Nodo aux = this.head;
-        while ( aux.next != null || !aux.next.elem.equals(o)) {
+        while ( aux.next != null && !aux.elem.equals((E)o)) {
             aux = aux.next;
         }
-        if (aux.next.elem.equals(o)) {
-            aux = aux.next;
+        if (aux.elem.equals((E)o)){
             aux.prev.next = aux.next;
             aux.next.prev = aux.prev;
+            this.tam--;
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public int size() {
-        Nodo aux = this.head;
-        int k = 0;
-        while (aux.next != null){
-            aux = aux.next;
-            k++;
-        }
-        return k;
+        return this.tam;
     }
 
     public Object[] toArray() {
@@ -144,24 +158,9 @@ public class Lista<E> implements List<E>{
         Object[] lista = this.toArray();
         String s = "";
         for (int k = 0; k < lista.length; k++) {
-            s = s +lista[k].toString() + "\n";
+            s += ((E)lista[k]).toString() + "\n";
         }
         return s;
-    }
-
-    public Lista<E> concat(Lista<E> lista) {
-        Lista<E> laux = new Lista();
-        Nodo aux = this.head;
-        while (aux != null) {
-            laux.add((E)aux.elem);
-            aux =  aux.next;
-        }
-        aux = lista.head;
-        while (aux != null) {
-            laux.add((E)aux.elem);
-            aux =  aux.next;
-        }
-        return laux;
     }
 
     private class Nodo <E>{
@@ -207,13 +206,16 @@ public class Lista<E> implements List<E>{
 
     public static void main (String[] args) {
         System.out.println("\n\n\t\tBienvenido al programa de prueba de" +
-                " Lista("+args[0]+")!!!\n\n");
+                " Lista(Arc)!!!\n\n");
         System.out.println("\t\t\tPodras trabajar maximo con 2 listas\n\n");
         int opcion = 0;
+        boolean exit = false;
+        List<Arc> lista1 = null;
+        List<Arc> lista2 = null;
         do {
             System.out.println("\t\t\tMENU:\n");
-            System.out.println("01)Inicializar la primera Lista("+args[0]+")");
-            System.out.println("02)Inicializar la segunda Lista("+args[0]+")");
+            System.out.println("01)Inicializar la primera Lista(Arc)");
+            System.out.println("02)Inicializar la segunda Lista(Arc)");
             System.out.println("03)Añadir un nuevo elemento a la primera" +
                     " lista");
             System.out.println("04)Añadir un nuevo elemento a la primera" +
@@ -249,7 +251,84 @@ public class Lista<E> implements List<E>{
             System.out.println("21)Saber el tamaño de la segunda lista");
             System.out.println("22)Imprimir la lista en pantalla");
             System.out.println("23)Salir del programa");
+            System.out.println("Introduzca una opcion valida [1-23]...");
             opcion = Console.readInt("\nQue desea hacer???\n\n\t>> ");
-        } while (opcion < 1 || 23 < opcion);
+            if (opcion == 1) {
+                lista1 = new Lista();
+            } else if (opcion == 2) {
+                lista2 = new Lista();
+            } else if (opcion == 3) {
+                int nodoIni = Console.readInt
+                        ("\nIngrese el nodo fuente\n\t>>");
+                int nodoFin = Console.readInt
+                        ("\nIngrese el nodo destino\n\t>>");
+                lista1.add(new Arc(nodoIni,nodoFin));
+            } else if (opcion == 4) {
+                int nodoIni = Console.readInt
+                        ("\nIngrese el nodo fuente\n\t>>");
+                int nodoFin = Console.readInt
+                        ("\nIngrese el nodo destino\n\t>>");
+                int posicion = Console.readInt
+                        ("\nIngrese una posicion\n\t>>");
+                lista1.add(posicion, new Arc(nodoIni, nodoFin));
+            } else if (opcion == 5) {
+                lista1.clear();
+            } else if (opcion == 6) {
+                lista2 = lista1.clone();
+            } else if (opcion == 7) {
+                int nodoIni = Console.readInt
+                        ("\nIngrese el nodo fuente\n\t>>");
+                int nodoFin = Console.readInt
+                        ("\nIngrese el nodo destino\n\t>>");
+                boolean esta = lista1.contains(new Arc(nodoIni,nodoFin));
+                System.out.println("La lista " + (esta ? "SI":"NO")+
+                        " contiene el elemento (" + nodoIni + ", " + nodoFin +
+                        ")...");
+            } else if (opcion == 8) {
+                int nodoIni = Console.readInt
+                        ("\nIngrese el nodo fuente\n\t>>");
+                int nodoFin = Console.readInt
+                        ("\nIngrese el nodo destino\n\t>>");
+                boolean esta = lista2.contains(new Arc(nodoIni,nodoFin));
+                System.out.println("La lista " + (esta ? "SI":"NO")+
+                        " contiene el elemento (" + nodoIni + ", " + nodoFin +
+                        ")...");
+            } else if (opcion == 9) {
+                boolean iguales = lista1.equals(lista2);
+                System.out.println("La lista1 y la lista 2 " +
+                        (iguales ? "SI":"NO") + " son iguales");
+            } else if (opcion == 10) {
+
+            } else if (opcion == 11) {
+
+            } else if (opcion == 12) {
+
+            } else if (opcion == 13) {
+
+            } else if (opcion == 14) {
+
+            } else if (opcion == 15) {
+
+            } else if (opcion == 16) {
+
+            } else if (opcion == 17) {
+
+            } else if (opcion == 18) {
+
+            } else if (opcion == 19) {
+
+            } else if (opcion == 20) {
+
+            } else if (opcion == 21) {
+
+            } else if (opcion == 22) {
+
+            } else if (opcion == 23) {
+                exit = true;
+            } else if (opcion < 1 || 23 < opcion) {
+                System.out.println("Introduzca una opcion valida [0-23]...");
+            }
+        } while (!exit);
+
     }
 }

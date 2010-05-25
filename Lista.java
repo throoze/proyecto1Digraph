@@ -23,25 +23,33 @@ public class Lista<E> implements List<E>{
         } else {
             Nodo nuevo = new Nodo(this.tail,element);
             this.tail.next = nuevo;
+            this.tail = nuevo;
         }
         this.tam++;
         return true;
     }
 
+    // ESTE TIENE ERRORES
     public boolean add(int index, E element) {
-        if (index < this.size()) {
-            Nodo aux = this.head;
-            int k;
-            for (k = -1; k < index; k++) {
-                aux = aux.next;
-            }
-            if (aux.next != null) {
-                Nodo nuevo = new Nodo(aux, element, aux.next);
-                aux.next.prev = nuevo;
-                aux.next = nuevo;
-            } else {
-                Nodo nuevo = new Nodo(aux, element);
-                aux.next = nuevo;
+        if (index <= this.tam) {
+            if (index < this.tam) {
+                Nodo aux = this.head;
+                int k;
+                for (k = -1; k < index; k++) {
+                    aux = aux.next;
+                }
+                if (aux.next != null) {
+                    Nodo nuevo = new Nodo(aux, element, aux.next);
+                    aux.next.prev = nuevo;
+                    aux.next = nuevo;
+                } else {
+                    Nodo nuevo = new Nodo(aux, element);
+                    aux.next = nuevo;
+                }
+            } else if (index == this.tam) {
+                Nodo nuevo = new Nodo(this.tail, element);
+                this.tail.next = nuevo;
+                this.tail = nuevo;
             }
             tam++;
             return true;
@@ -116,24 +124,42 @@ public class Lista<E> implements List<E>{
     }
 
     public E remove(int index) {
-        Nodo aux = this.head;
-        for (int k = -1; k < index && aux.next != null; k++){
-            aux = aux.next;
+        if (index < this.tam -1) {
+            Nodo aux = this.head;
+            for (int k = -1; k < index && aux.next != null; k++) {
+                aux = aux.next;
+            }
+            aux.prev.next = aux.next;
+            if (aux.next != null) {
+                aux.next.prev = aux.prev;
+            }
+            this.tam--;
+            return (E) aux.elem;
+        } else if (index == this.tam -1) {
+            Nodo nodo = this.tail;
+            this.tail = this.tail.prev;
+            this.tail.next = null;
+            this.tam--;
+            return (E) nodo.elem;
+        } else {
+            return null;
         }
-        aux.prev.next = aux.next;
-        aux.next.prev = aux.prev;
-        this.tam--;
-        return (E) aux.elem;
     }
 
+    //ESTE TIENE ERRORES
     public boolean remove(Object o) {
         Nodo aux = this.head;
         while ( aux.next != null && !aux.elem.equals((E)o)) {
             aux = aux.next;
         }
         if (aux.elem.equals((E)o)){
-            aux.prev.next = aux.next;
-            aux.next.prev = aux.prev;
+            if (this.tail.equals(aux)) {
+                this.tail = this.tail.prev;
+                this.tail.next = null;
+            } else {
+                aux.prev.next = aux.next;
+                aux.next.prev = aux.prev;
+            }
             this.tam--;
             return true;
         }
@@ -149,6 +175,7 @@ public class Lista<E> implements List<E>{
         Nodo aux = this.head;
         for (int k = 0; k < lista.length; k++) {
             lista[k] = aux.next.elem;
+            aux = aux.next;
         }
         return lista;
     }
@@ -199,6 +226,17 @@ public class Lista<E> implements List<E>{
             nuevo.next = this.next;
             nuevo.prev = this.prev;
             return nuevo;
+        }
+
+        @Override
+        public boolean equals (Object o) {
+            if (o instanceof Nodo) {
+                Nodo nuevo = (Nodo) o;
+                return (this.next == nuevo.next && this.prev == nuevo.prev &&
+                        this.elem.equals(nuevo.elem));
+            } else {
+                return false;
+            }
         }
     }
 
@@ -298,31 +336,75 @@ public class Lista<E> implements List<E>{
                 System.out.println("La lista1 y la lista 2 " +
                         (iguales ? "SI":"NO") + " son iguales");
             } else if (opcion == 10) {
-
+                int posicion = Console.readInt
+                        ("\nIngrese una posicion\n\t>>");
+                System.out.println("El elemento de la posicion "+posicion+
+                        " es: "+lista1.get(posicion).toString());
             } else if (opcion == 11) {
-
+                int posicion = Console.readInt
+                        ("\nIngrese una posicion\n\t>>");
+                System.out.println("El elemento de la posicion "+posicion+
+                        " es: "+lista2.get(posicion).toString());
             } else if (opcion == 12) {
-
+                int nodoIni = Console.readInt
+                        ("\nIngrese el nodo fuente\n\t>>");
+                int nodoFin = Console.readInt
+                        ("\nIngrese el nodo destino\n\t>>");
+                System.out.println("El elemento (" + nodoIni + ", " + nodoFin +
+                        ") esta en la posicion: " +
+                        lista1.indexOf(new Arc(nodoIni,nodoFin)));
             } else if (opcion == 13) {
-
+                int nodoIni = Console.readInt
+                        ("\nIngrese el nodo fuente\n\t>>");
+                int nodoFin = Console.readInt
+                        ("\nIngrese el nodo destino\n\t>>");
+                System.out.println("El elemento (" + nodoIni + ", " + nodoFin +
+                        ") esta en la posicion: " +
+                        lista2.indexOf(new Arc(nodoIni,nodoFin)));
             } else if (opcion == 14) {
-
+                System.out.println("\nLa primera lista " +
+                        (lista1.isEmpty() ? "SI" : "NO") + " está vacia...\n");
             } else if (opcion == 15) {
-
+                System.out.println("\nLa segunda lista " +
+                        (lista2.isEmpty() ? "SI" : "NO") + " está vacia...\n");
             } else if (opcion == 16) {
-
+                int posicion = Console.readInt
+                        ("\nIngrese una posicion\n\t>>");
+                Arc arco = lista1.remove(posicion);
+                System.out.println("\nSe ha removido el arco: " +
+                        arco.toString() + " de la primera lista...\n");
             } else if (opcion == 17) {
-
+                int posicion = Console.readInt
+                        ("\nIngrese una posicion\n\t>>");
+                Arc arco = lista2.remove(posicion);
+                System.out.println("\nSe ha removido el arco: " +
+                        arco.toString() + " de la segunda lista...\n");
             } else if (opcion == 18) {
-
+                int nodoIni = Console.readInt
+                        ("\nIngrese el nodo fuente\n\t>>");
+                int nodoFin = Console.readInt
+                        ("\nIngrese el nodo destino\n\t>>");
+                boolean removido = lista1.remove(new Arc(nodoIni, nodoFin));
+                System.out.println("El elemento (" + nodoIni + ", " + nodoFin +
+                        ") " + (removido ? "SI" : "NO") + " fue removido de " +
+                        "la primera lista...\n");
             } else if (opcion == 19) {
-
+                int nodoIni = Console.readInt
+                        ("\nIngrese el nodo fuente\n\t>>");
+                int nodoFin = Console.readInt
+                        ("\nIngrese el nodo destino\n\t>>");
+                boolean removido = lista2.remove(new Arc(nodoIni, nodoFin));
+                System.out.println("El elemento (" + nodoIni + ", " + nodoFin +
+                        ") " + (removido ? "SI" : "NO") + " fue removido de " +
+                        "la segunda lista...\n");
             } else if (opcion == 20) {
-
+                System.out.println("La primera lista es de tamaño: " +
+                        lista1.size());
             } else if (opcion == 21) {
-
+                System.out.println("La segunda lista es de tamaño: " +
+                        lista2.size());
             } else if (opcion == 22) {
-
+                System.out.println("\nLa Lista es:\n\n" + lista1.toString());
             } else if (opcion == 23) {
                 exit = true;
             } else if (opcion < 1 || 23 < opcion) {

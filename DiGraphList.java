@@ -132,6 +132,7 @@ public class DiGraphList extends DiGraph {
             salida.addArc(i, i);
         }
         int flag;
+        int counter = 0;
         do {
             boolean stop = false;
             flag = salida.numArcs;
@@ -142,6 +143,7 @@ public class DiGraphList extends DiGraph {
                         int c = salida.outArcs[b].get(j).getDst();
                         if (!salida.isArc(a, c)) {
                             salida.addArc(a, c);
+                            counter++;
                             stop = true;
                         }
                     }

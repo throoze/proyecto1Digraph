@@ -41,8 +41,9 @@ public class Main {
             if (tokens.length == 2) {
                 if (tokens[0].matches("[0-9]+?") &&
                     tokens[1].matches("[0-9]+?")) {
-                    return ((new Integer(tokens[0]).intValue()) >
-                            (new Integer(tokens[1]).intValue()) ? 1 : 0);
+                    int nNodos = (new Integer(tokens[0]).intValue());
+                    int nArcos = (new Integer(tokens[1]).intValue());
+                    return (nNodos > nArcos ? 1 : 0);
                     // 0 = DiGraphMatrix, 1 = DiGraphList
                 } else {
                     throw new ExcepcionFormatoIncorrecto("\nEn la primera" +

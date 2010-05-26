@@ -28,8 +28,8 @@ public class DiGraphList extends DiGraph {
     public DiGraphList() {
         this.inArcs = null;
         this.outArcs = null;
-        this.numArcs = -1;
-        this.numNodes = -1;
+        this.numArcs = 0;
+        this.numNodes = 0;
     }
 
     /**
@@ -37,87 +37,23 @@ public class DiGraphList extends DiGraph {
      * @param n numero de nodos iniciales de grafo
      */
     public DiGraphList(int n) {
-        inArcs = new List[n];
-        outArcs = new List[n];
+        this.inArcs = new List[n];
+        this.outArcs = new List[n];
+        for (int i = 0; i < n; i++) {
+            this.inArcs[i] = new Lista();
+            this.outArcs[i] = new Lista();
+        }
+        this.numNodes = n;
+        this.numArcs = 0;
     }
 
     /**
      * Crea un DiGraphList a partir del contenido de un archivo
      * @param fileName nombre del archivo
      */
-    public DiGraphList(String fileName) throws IOException
-    {
+    public DiGraphList(String fileName) throws IOException {
         this();
-        if ((new File(fileName)).exists() &&
-            (new File(fileName)).isFile() &&
-            (new File(fileName)).canRead())  {
-            BufferedReader inbuff = null;
-            try {
-                inbuff = new BufferedReader(new FileReader(fileName));
-            } catch (FileNotFoundException fnfe) {
-                System.out.println("Esto no deberia pasar, contacte" +
-                        " al programador...");
-                System.out.println("MENSAJE:" + fnfe.getMessage() + "\n" +
-                        "CAUSA:" + fnfe.getCause().toString() + "\n");
-                throw new ExcepcionArchivoNoSePuedeLeer("Problema Leyendo el" +
-                        " archivo \"" + fileName +
-                        "\" al momento de crear el buffer lector...\n");
-            }
-            String linea = null;
-            try {
-                 linea = inbuff.readLine();
-            } catch (IOException ioe) {
-                System.out.println("Esto no deberia pasar, contacte" +
-                        " al programador...");
-                System.out.println("MENSAJE:" + ioe.getMessage() + "\n" +
-                        "CAUSA:" + ioe.getCause().toString() + "\n");
-                throw new ExcepcionArchivoNoSePuedeLeer("Problema Leyendo la" +
-                        "primera linea del archivo \"" + fileName +
-                        "\"");
-            }
-            String[] tokens = linea.split(" ");
-            if (tokens.length == 2) {
-                if (tokens[0].matches("[0-9]+?") &&
-                    tokens[1].matches("[0-9]+?")) {
-                    /* Aqui empiezan las diferencias en este constructor entre
-                     * DiGraphList y DiGraphMatrix
-                     */
-                    this.inArcs = new List[new Integer(tokens[0]).intValue()];
-                    this.outArcs = new List[new Integer(tokens[0]).intValue()];
-                    for (int k = 0; k < this.inArcs.length; k++) {
-                        this.inArcs[k] = new Lista();
-                        this.outArcs[k] = new Lista();
-                    }
-                    /* Fin de las diferencias en este constructor entre
-                     * DiGraphList y DiGraphMatrix
-                     */
-                    this.numNodes = new Integer(tokens[0]).intValue();
-                    this.numArcs = new Integer(tokens[1]).intValue();
-                    this.fillFromFile(inbuff, fileName);
-                } else {
-                    throw new ExcepcionFormatoIncorrecto("En la primera linea" +
-                            " hay un error de sintaxis: Se esperaba un numero" +
-                            " seguido de otro numero (numNodos numArcos) y se" +
-                            " encontro: " + tokens[0] + " " + tokens[1] + "\n");
-                }
-            } else {
-                throw new ExcepcionFormatoIncorrecto("En la primera linea hay" +
-                        "un error de sintaxis: Se esperaban dos elementos (" +
-                        "numNodos numArcos), y se encontro:\n\t"+
-                        tokens.toString());
-            }
-        } else if (!(new File(fileName)).exists()) {
-            throw new ExcepcionArchivoNoExiste("Problema al leer el archivo " +
-                    "\"" + fileName +"\": EL ARCHIVO NO EXISTE!!!");
-        } else if (!(new File(fileName)).isFile()) {
-            throw new ExcepcionNoEsArchivo("Problema al leer el archivo \"" +
-                    fileName +"\": NO ES UN ARCHIVO!!!");
-        } else if (!(new File(fileName)).canRead()) {
-            throw new ExcepcionArchivoNoSePuedeLeer("Problema al leer el ar" +
-                    "chivo \"" + fileName +"\": ESTE ARCHIVO NO SE PUEDE" +
-                    " LEER!!!");
-        }
-        //this.read(fileName);
+        this.read(fileName);
     }
 
     /**
@@ -125,10 +61,14 @@ public class DiGraphList extends DiGraph {
      * @param g
      */
     public DiGraphList(DiGraph g) {
+        this();
         this.inArcs = new List[g.numNodes];
         this.outArcs = new List[g.numNodes];
+        for (int i = 0; i < g.numNodes; i++) {
+            this.inArcs[i] = new Lista();
+            this.outArcs[i] = new Lista();
+        }
         this.numNodes = g.numNodes;
-        this.numArcs = g.numArcs;
         for (int i = 0; i < this.numNodes; i++) {
             for  (int j = 0; j < this.numNodes; j++) {
                 if (g.isArc(i, j)) {
@@ -140,34 +80,42 @@ public class DiGraphList extends DiGraph {
 
     // Métodos:
 
-    public void addNodes(int num) {
-        List<Arc>[] arcosDeEntrada = new List[this.numNodes + num];
-        List<Arc>[] arcosDeSalida = new List[this.numNodes + num];
-        for (int k = 0; k < this.numNodes; k++) {
-            arcosDeEntrada[k] = this.inArcs[k];
-            arcosDeSalida[k] = this.outArcs[k];
-        }
-        this.numNodes = this.numNodes + num;
-        this.inArcs = arcosDeEntrada;
-        this.outArcs = arcosDeSalida;
-    }
-
     public Arc addArc(int src, int dst) {
-        Arc nuevo = new Arc(src,dst);
         if (!(this.isArc(src, dst))) {
+            Arc nuevo = new Arc(src,dst);
             this.inArcs[dst].add(nuevo);
             this.outArcs[src].add(nuevo);
+            this.numArcs++;
+            return (nuevo);
+        } else {
+            return null;
         }
-        return (nuevo);
     }
 
     public Arc addArc(int src, int dst, double costo) {
-        Arc nuevo = new Arc(src,dst,costo);
         if (!(this.isArc(src, dst))) {
+            Arc nuevo = new Arc(src,dst,costo);
             this.inArcs[dst].add(nuevo);
             this.outArcs[src].add(nuevo);
+            this.numArcs++;
+            return (nuevo);
+        } else {
+            return null;
         }
-        return (nuevo);
+    }
+
+    public void addNodes(int num) {
+        if (0 < num) {
+            List<Arc>[] arcosDeEntrada = new List[this.numNodes + num];
+            List<Arc>[] arcosDeSalida = new List[this.numNodes + num];
+            for (int k = 0; k < this.numNodes; k++) {
+                arcosDeEntrada[k] = this.inArcs[k];
+                arcosDeSalida[k] = this.outArcs[k];
+            }
+            this.numNodes = this.numNodes + num;
+            this.inArcs = arcosDeEntrada;
+            this.outArcs = arcosDeSalida;
+        }
     }
 
     /**
@@ -186,7 +134,7 @@ public class DiGraphList extends DiGraph {
         int flag;
         do {
             boolean stop = false;
-            flag = this.numArcs;
+            flag = salida.numArcs;
             for (int a = 0; a < salida.numNodes && !stop; a++) {
                 for (int i = 0; i < salida.outArcs[a].size() && !stop; i++) {
                     int b = salida.outArcs[a].get(i).getDst();
@@ -210,10 +158,14 @@ public class DiGraphList extends DiGraph {
     }
 
     public Arc delArc(int nodeIniId, int nodeFinId) {
-        Arc arco = new Arc(nodeIniId,nodeFinId);
-        this.inArcs[nodeFinId].remove(arco);
-        this.outArcs[nodeIniId].remove(arco);
-        return arco;
+        if (this.isArc(nodeIniId, nodeFinId)) {
+            Arc arco = new Arc(nodeIniId, nodeFinId);
+            this.inArcs[nodeFinId].remove(arco);
+            this.outArcs[nodeIniId].remove(arco);
+            return arco;
+        } else {
+            return null;
+        }
     }
 
     public boolean equals(DiGraph g) {
@@ -233,7 +185,11 @@ public class DiGraphList extends DiGraph {
 
     // preguntar si es asi...
     public Arc getArc(int nodoSrc, int nodoDst) {
-        return new Arc(nodoSrc,nodoDst);
+        if (this.isArc(nodoSrc, nodoDst)) {
+            return (new Arc(nodoSrc,nodoDst));
+        } else {
+            return null;
+        }
     }
 
     public int getDegree(int nodeId) {
@@ -282,8 +238,11 @@ public class DiGraphList extends DiGraph {
         return sucesors;
     }
 
+    //Acordarse de borrar el monton de comentarios...
     @Override
     public boolean isArc(int src, int dst) {
+        return this.outArcs[src].contains(new Arc(src,dst));
+        /*
         if (0 <= src && src < this.outArcs.length &&
             0 <= dst && dst < this.outArcs.length){
             Arc arco = new Arc(src,dst);
@@ -294,17 +253,19 @@ public class DiGraphList extends DiGraph {
                     return true;
                 }
             }
-            /*
+
+            // Otra posibilidad
+
             Object[] arreglo = this.outArcs[src].toArray();
             for (int i = 0; i < arreglo.length; i++) {
                 if (((Arc)arreglo[i]).equals(new Arc(src, dst))) {
                     return true;
                 }
             }
-             *
-             */
         }
         return false;
+         *
+         */
     }
 
     public void read(String fileName) throws IOException {
@@ -344,12 +305,16 @@ public class DiGraphList extends DiGraph {
                      */
                     this.inArcs = new List[new Integer(tokens[0]).intValue()];
                     this.outArcs = new List[new Integer(tokens[0]).intValue()];
+                    for (int k = 0; k < this.inArcs.length; k++) {
+                        this.inArcs[k] = new Lista();
+                        this.outArcs[k] = new Lista();
+                    }
                     /* Fin de las diferencias en este constructor entre
                      * DiGraphList y DiGraphMatrix
                      */
                     this.numNodes = new Integer(tokens[0]).intValue();
-                    this.numArcs = new Integer(tokens[1]).intValue();
-                    this.fillFromFile(inbuff, fileName);
+                    int nArcos = new Integer(tokens[1]).intValue();
+                    this.fillFromFile(inbuff, fileName, nArcos);
                 } else {
                     throw new ExcepcionFormatoIncorrecto("En la primera linea" +
                             " hay un error de sintaxis: Se esperaba un numero" +
@@ -409,11 +374,11 @@ public class DiGraphList extends DiGraph {
 
     @Override
     public String toString() {
-        String string = "Numero de NODOS: " + this.numNodes + "\n" +
-                "Numero de ARCOS: " + this.numArcs + "\n ARCOS:\n";
+        String string = this.numNodes + " " + this.numArcs;
         for (int i = 0; i < this.numNodes; i++) {
             for (int j = 0; j < this.outArcs[i].size(); j++) {
-                string += this.outArcs[i].get(j).toString() + "\n";
+                string += "\n" + this.outArcs[i].get(j).getSrc() + " " +
+                        this.outArcs[i].get(j).getDst();
             }
         }
         return string;
@@ -432,9 +397,9 @@ public class DiGraphList extends DiGraph {
                     /* A partir de aqui es diferente entre DiGraphList y
                      * DiGraphMatrix
                      */
-                    Arc[] arrArcs = (Arc[])this.outArcs[i].toArray();
+                    Object[] arrArcs = this.outArcs[i].toArray();
                     for (int j = 0; j < arrArcs.length; j++) {
-                        out.println(i + " " + arrArcs[j].getDst());
+                        out.println(i + " " + ((Arc)arrArcs[j]).getDst());
                     }
                     // Fin de las diferencias
                 }
@@ -443,27 +408,31 @@ public class DiGraphList extends DiGraph {
                         " al programador...");
                 System.out.println("MENSAJE:" + fnfe.getMessage() + "\n" +
                         "CAUSA:" + fnfe.getCause().toString() + "\n");
-                throw new ExcepcionArchivoNoSePuedeEscribir("Problema escri" +
-                        "biendo en el archivo \"" + fileName + "\"");
+                throw new ExcepcionArchivoNoSePuedeEscribir("\nProblema" +
+                        " escribiendo en el archivo \"" + fileName + "\"");
             }
         } else if (!(new File(fileName)).exists()) {
-            throw new ExcepcionArchivoNoExiste("Problema al leer el archivo " +
-                    "\"" + fileName +"\": EL ARCHIVO NO EXISTE!!!");
+            throw new ExcepcionArchivoNoExiste("\nProblema al leer el" +
+                    " archivo \"" + fileName +"\":\n\tEL ARCHIVO NO" +
+                    " EXISTE!!!\n");
         } else if (!(new File(fileName)).isFile()) {
-            throw new ExcepcionNoEsArchivo("Problema al leer el archivo \"" +
-                    fileName +"\": NO ES UN ARCHIVO!!!");
+            throw new ExcepcionNoEsArchivo("\nProblema al leer el" +
+                    " archivo \"" + fileName +"\":\n\tNO ES UN ARCHIVO!!!\n");
         } else if (!(new File(fileName)).canWrite()) {
-            throw new ExcepcionArchivoNoSePuedeEscribir("Problema al leer el " +
-                    "archivo \"" + fileName +"\": ESTE ARCHIVO NO SE PUEDE" +
-                    " LEER!!!");
+            throw new ExcepcionArchivoNoSePuedeEscribir("\nProblema al leer" +
+                    " el archivo \"" + fileName +"\":\n\tESTE ARCHIVO NO SE" +
+                    " PUEDE LEER!!!\n");
         }
     }
 
     // METODOS PRIVADOR AUXILIARES:
 
-    private void fillFromFile(BufferedReader inbuff, String fileName)
-                                        throws ExcepcionArchivoNoSePuedeLeer,
-                                               ExcepcionFormatoIncorrecto
+    private void fillFromFile(BufferedReader inbuff, String fileName, int nArc)
+                                throws ExcepcionArchivoNoSePuedeLeer,
+                                       ExcepcionFormatoIncorrecto,
+                                       ExcepcionArcoRepetido,
+                                       ExcepcionInconsistenciaNumeroDeNodos,
+                                       ExcepcionInconsistenciaNumeroDeArcos
     {
         String linea = "";
         String[] tokens;
@@ -475,32 +444,45 @@ public class DiGraphList extends DiGraph {
                     + " al programador...");
             System.out.println("MENSAJE:" + ioe.getMessage() + "\n"
                     + "CAUSA:" + ioe.getCause().toString() + "\n");
-            throw new ExcepcionArchivoNoSePuedeLeer("Problema Leyendo la"
+            throw new ExcepcionArchivoNoSePuedeLeer("\nProblema Leyendo la"
                         + "linea " + k + " del archivo \"" + fileName
                         + "\"");
         }
         while (linea != null) {
-            System.out.println("linea vale: "+linea);
             tokens = linea.split(" ");
-            System.out.println("linea vale: "+linea);
             if (tokens.length == 2) {
                 if (tokens[0].matches("[0-9]+?") &&
                     tokens[1].matches("[0-9]+?")) {
-                    this.addArc(new Integer(tokens[0]).intValue(),
-                                new Integer(tokens[1]).intValue());
+                    int src = (new Integer(tokens[0]).intValue());
+                    int dst = (new Integer(tokens[1]).intValue());
+                    if ((src < 0 || this.numNodes <= src)) {
+                        throw new ExcepcionInconsistenciaNumeroDeNodos("\nEl " +
+                                "grafo de entrada tiene un numero de nodos " +
+                                "distinto al indicado al principio del ar" +
+                                "chivo:\nEncontrado \"" + tokens[0] + "\" en" +
+                                " la linea " + k + ", y se esperaba en el" +
+                                " intervalo [0 - " + nArc + "]");
+                    } else if (dst < 0 || this.numNodes <= dst) {
+                        throw new ExcepcionInconsistenciaNumeroDeNodos("\nEl " +
+                                "grafo de entrada tiene un numero de nodos " +
+                                "distinto al indicado al principio del ar" +
+                                "chivo:\nEncontrado \"" + tokens[1] + "\" en" +
+                                " la linea " + k + ", y se esperaba en el" +
+                                " intervalo [0 - " + nArc + "]");
+                    }
+                    this.addArc(src,dst);
                 } else {
-                    throw new ExcepcionFormatoIncorrecto("En la linea " + k +
+                    throw new ExcepcionFormatoIncorrecto("\nEn la linea " + k +
                             " del archivo \"" + fileName + "\"" +
-                            " hay un error de sintaxis: Se esperaba un numero" +
-                            " seguido de otro numero (numNodos numArcos) y se" +
-                            " encontro: " + tokens[0] + " " + tokens[1] + "\n");
+                            " hay un error de sintaxis:\nSe esperaba un numero"+
+                            " seguido de otro numero (src dst) y se encontró" +
+                            ": \n\t\"" + tokens[0] + " " + tokens[1] + "\"\n");
                 }
             } else {
-                throw new ExcepcionFormatoIncorrecto("En la linea " + k +
-                            " del archivo \"" + fileName + "\" hay " +
-                        "un error de sintaxis: Se esperaban dos elementos (" +
-                        "numNodos numArcos), y se encontro:\n\t"+
-                        tokens.toString());
+                throw new ExcepcionFormatoIncorrecto("\nEn la linea " + k +
+                        " del archivo \"" + fileName + "\" hay" +
+                        " un error de sintaxis:\nSe esperaban dos elementos" +
+                        " (src dst), y se encontro:\n\t\"" + linea + "\"\n");
             }
             k++;
             try {
@@ -510,10 +492,15 @@ public class DiGraphList extends DiGraph {
                         + " al programador...");
                 System.out.println("MENSAJE:" + ioe.getMessage() + "\n"
                         + "CAUSA:" + ioe.getCause().toString() + "\n");
-                throw new ExcepcionArchivoNoSePuedeLeer("Problema Leyendo la"
-                        + "linea " + k + " del archivo \"" + fileName
-                        + "\"");
+                throw new ExcepcionArchivoNoSePuedeLeer("\nProblema Leyendo la"
+                        + "linea " + k + " del archivo \"" + fileName + "\"");
             }
+        }
+        if (linea == null && k-2 != nArc) {
+            throw new ExcepcionInconsistenciaNumeroDeArcos("El grafo de entra" +
+                    "da tiene menos arcos que los indicados al principio del " +
+                    "archivo:\nTiene " + (k-2) + " arco(s), y se esperaba(n) " +
+                    nArc + " arco(s)");
         }
     }
 }

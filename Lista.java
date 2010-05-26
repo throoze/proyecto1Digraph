@@ -17,9 +17,10 @@ public class Lista<E> implements List<E>{
 
     public boolean add(E element) {
         if (this.isEmpty()) {
-            this.head.next = new Nodo(this.head,element);
+            Nodo nuevo = new Nodo(this.head,element);
+            this.head.next = nuevo;
             this.head.prev = null;
-            this.tail = head.next;
+            this.tail = nuevo;
         } else {
             Nodo nuevo = new Nodo(this.tail,element);
             this.tail.next = nuevo;
@@ -29,29 +30,42 @@ public class Lista<E> implements List<E>{
         return true;
     }
 
-    // ESTE TIENE ERRORES
     public boolean add(int index, E element) {
-        if (index <= this.tam) {
+        if (0 <= index && index <= this.tam) {
             if (index < this.tam) {
-                Nodo aux = this.head;
-                int k;
-                for (k = -1; k < index; k++) {
-                    aux = aux.next;
-                }
-                if (aux.next != null) {
-                    Nodo nuevo = new Nodo(aux, element, aux.next);
-                    aux.next.prev = nuevo;
-                    aux.next = nuevo;
+                Nodo aux;
+                if (index < (this.tam/2)) {
+                    int k = 0;
+                    aux = this.head.next;
+                    while (k < index) {
+                        aux = aux.next;
+                        k++;
+                        System.out.println("busco en la posicion " + k);
+                    }
+                    System.out.println("aux esta en la posicion " + k);
                 } else {
-                    Nodo nuevo = new Nodo(aux, element);
-                    aux.next = nuevo;
+                    int k = this.tam - 1;
+                    aux = this.tail;
+                    while (k > index) {
+                        aux = aux.prev;
+                        k--;
+                        System.out.println("busco en la posicion " + k);
+                    }
+                    System.out.println("aux esta en la posicion " + k);
                 }
+                Nodo nuevo = new Nodo(aux.prev, element, aux);
+                this.tam++;
             } else if (index == this.tam) {
-                Nodo nuevo = new Nodo(this.tail, element);
-                this.tail.next = nuevo;
-                this.tail = nuevo;
+                if (this.isEmpty()) {
+                    this.add(element);
+                } else {
+                    Nodo nuevo = new Nodo(this.tail, element);
+                    this.tail.next = nuevo;
+                    this.tail = nuevo;
+                    this.tail.next = null;
+                    this.tam++;
+                }
             }
-            tam++;
             return true;
         } else {
             return false;
@@ -146,22 +160,29 @@ public class Lista<E> implements List<E>{
         }
     }
 
-    //ESTE TIENE ERRORES
     public boolean remove(Object o) {
-        Nodo aux = this.head;
-        while ( aux.next != null && !aux.elem.equals((E)o)) {
-            aux = aux.next;
-        }
-        if (aux.elem.equals((E)o)){
-            if (this.tail.equals(aux)) {
-                this.tail = this.tail.prev;
-                this.tail.next = null;
-            } else {
-                aux.prev.next = aux.next;
-                aux.next.prev = aux.prev;
+        if (this.isEmpty()) {
+            return false;
+        } else {
+            Nodo aux = this.head;
+            boolean stop = false;
+            while ( aux.next != null && !stop) {
+                aux = aux.next;
+                if (aux.elem.equals((E)o)) {
+                    stop = true;
+                }
             }
-            this.tam--;
-            return true;
+            if (aux.elem.equals((E)o)){
+                if (this.tail.equals(aux)) {
+                    this.tail = this.tail.prev;
+                    this.tail.next = null;
+                } else {
+                    aux.prev.next = aux.next;
+                    aux.next.prev = aux.prev;
+                }
+                this.tam--;
+                return true;
+            }
         }
         return false;
     }
@@ -205,18 +226,22 @@ public class Lista<E> implements List<E>{
             this.elem = elem;
             this.prev = ant;
             this.next = null;
+            ant.next = this;
         }
         
         public Nodo(E elem, Nodo sig) {
             this.elem = elem;
             this.prev = null;
             this.next = sig;
+            sig.prev = this;
         }
         
         public Nodo (Nodo ant, E elem, Nodo sig) {
             this.elem = elem;
             this.prev = ant;
             this.next = sig;
+            ant.next = this;
+            sig.prev = this;
         }
 
         @Override

@@ -17,13 +17,25 @@ public class DiGraphMatrix extends DiGraph {
     private boolean matrix[][];
     
     // Constructores:
+
+    public DiGraphMatrix() {
+        this.matrix = null;
+        this.numArcs = 0;
+        this.numNodes = 0;
+    }
     
     /**
      * Crea un DiGraphMatrix con n nodos y sin arcos
      * @param n
      */
     public DiGraphMatrix(int n) {
+        this();
         matrix = new boolean[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j =0; j < n; j++) {
+                this.matrix[i][j] = false;
+            }
+        }
         numNodes = n;
     }
     
@@ -33,6 +45,7 @@ public class DiGraphMatrix extends DiGraph {
      * @param fileName nombre del archivo
      */
     public DiGraphMatrix(String fileName) throws IOException {
+        this(0);
         this.read(fileName);
     }
     
@@ -42,38 +55,54 @@ public class DiGraphMatrix extends DiGraph {
      * @param g el grafo fuente.
      */
     public DiGraphMatrix(DiGraph g) {
-     this.matrix = new boolean [g.numNodes][g.numNodes];
-     for (int i = 0; i < this.numNodes; i++) {
-         for (int j=0; j< this.numNodes; j++){
-             if (g.isArc(i, j)){
-                 this.addArc(i,j);
-             }
-         }
-     }
-
-   }
+        this(0);
+        this.numNodes = g.numNodes;
+        this.matrix = new boolean [g.numNodes][g.numNodes];
+        for (int i = 0; i < this.numNodes; i++) {
+            for (int j=0; j< this.numNodes; j++){
+                if (g.isArc(i, j)){
+                    this.addArc(i,j);
+                } else {
+                    this.matrix[i][j] = false;
+                }
+            }
+        }
+    }
 
     public Arc addArc(int src, int dst) {
-        this.matrix[src][dst] = true;
-        Arc arco = new Arc(src,dst);
-	return arco;
+        if (!this.isArc(src, dst)) {
+            this.matrix[src][dst] = true;
+            this.numArcs++;
+            Arc arco = new Arc(src, dst);
+            return arco;
+        } else {
+            return null;
+        }
     }
 
     public Arc addArc(int src, int dst, double costo) {
-        this.matrix[src][dst] = true;
-        Arc arco = new Arc(src,dst,costo);
-	return arco;
+        if (!this.isArc(src, dst)) {
+            this.matrix[src][dst] = true;
+            Arc arco = new Arc(src, dst, costo);
+            this.numArcs++;
+            return arco;
+        } else {
+            return null;
+        }
     }
 
     @Override
     public void addNodes(int num) {
-        DiGraphMatrix nuevo = new DiGraphMatrix(this.numNodes + num);
-        for (int i = 0; i < this.numNodes; i++) {
-            for (int j = 0; j < this.numNodes; j++) {
-                if (this.matrix[i][j]) {
-                    nuevo.matrix[i][j] = true;
+        if (0 < num) {
+            DiGraphMatrix nuevo = new DiGraphMatrix(this.numNodes + num);
+            for (int i = 0; i < this.numNodes; i++) {
+                for (int j = 0; j < this.numNodes; j++) {
+                    if (this.matrix[i][j]) {
+                        nuevo.matrix[i][j] = true;
+                    }
                 }
             }
+            this.numNodes += num;
         }
     }
 
@@ -85,27 +114,29 @@ public class DiGraphMatrix extends DiGraph {
      * calculada usando el algoritmo Roy-Warshal
      */
     @Override
-    public DiGraph alcance() {
-        DiGraphMatrix nuevo = new DiGraphMatrix(this.numNodes);
+    public DiGraph alcance() {        
         // Se trabaja sobre una copia, para no modificar el original
-        copy_matrix(this.matrix,nuevo.matrix);
+        DiGraphMatrix nuevo = this.clone();
         // Añadimos la diagonal principal...
-        for (int i = 0; i < this.numNodes; i++){
-            nuevo.matrix[i][i] = true;
+        for (int i = 0; i < nuevo.numNodes; i++){
+            if (!nuevo.isArc(i, i)) {
+                nuevo.addArc(i, i);
+            }
         }
         // Se calculan los demás arcos transitivos
         for (int i = 0; i < this.numNodes; i++){
             for (int j = 0; j < this.numNodes; j++){
 	        if (nuevo.matrix[i][j] && i != j){
 	            for (int k = 0; k < this.numNodes; k++){
-	                nuevo.matrix[i][k] =
-                                (nuevo.matrix[i][k] || nuevo.matrix[j][k]);
+                        if ((nuevo.matrix[i][k] || nuevo.matrix[j][k]) &&
+                                !nuevo.isArc(i, k)) {
+                            nuevo.addArc(i, k);
+                        }
 		    }
 	        }
 	    }
         }
         return nuevo;
-
     }
 
     @Override
@@ -115,9 +146,13 @@ public class DiGraphMatrix extends DiGraph {
     }
 
     public Arc delArc(int nodeIniId, int nodeFinId) {
-        Arc arco = new Arc(nodeIniId,nodeFinId);
-        this.matrix[nodeIniId][nodeFinId] = false;
-	return arco;
+        if (this.isArc(nodeIniId, nodeFinId)) {
+            Arc arco = new Arc(nodeIniId, nodeFinId);
+            this.matrix[nodeIniId][nodeFinId] = false;
+            return arco;
+        } else {
+            return null;
+        }
     }
     
     @Override
@@ -134,7 +169,11 @@ public class DiGraphMatrix extends DiGraph {
     }
     
     public Arc getArc(int nodoSrc, int nodoDst) {
-        return new Arc(nodoSrc,nodoDst);
+        if (this.isArc(nodoSrc, nodoDst)) {
+            return new Arc(nodoSrc, nodoDst);
+        } else {
+            return null;
+        }
     }
     
     public int getDegree(int nodeId) {
@@ -214,7 +253,7 @@ public class DiGraphMatrix extends DiGraph {
 
     @Override
     public boolean isArc(int src, int dst) {
-        return this.matrix[src][dst];
+        return (this.matrix[src][dst]);
     }
 
     public void read(String fileName) throws IOException {
@@ -229,9 +268,9 @@ public class DiGraphMatrix extends DiGraph {
                         " al programador...");
                 System.out.println("MENSAJE:" + fnfe.getMessage() + "\n" +
                         "CAUSA:" + fnfe.getCause().toString() + "\n");
-                throw new ExcepcionArchivoNoSePuedeLeer("Problema Leyendo el" +
-                        " archivo \"" + fileName +
-                        "\" al momento de crear el buffer lector...\n");
+                throw new ExcepcionArchivoNoSePuedeLeer("\nProblema Leyendo" +
+                        " el archivo \"" + fileName + "\" al momento de crear" +
+                        " el buffer lector...\n");
             }
             String linea = null;
             try {
@@ -241,9 +280,8 @@ public class DiGraphMatrix extends DiGraph {
                         " al programador...");
                 System.out.println("MENSAJE:" + ioe.getMessage() + "\n" +
                         "CAUSA:" + ioe.getCause().toString() + "\n");
-                throw new ExcepcionArchivoNoSePuedeLeer("Problema Leyendo la" +
-                        "primera linea del archivo \"" + fileName +
-                        "\"");
+                throw new ExcepcionArchivoNoSePuedeLeer("\nProblema Leyendo" +
+                        " la primera linea del archivo \"" + fileName + "\"");
             }
             String[] tokens = linea.split(" ");
             if (tokens.length == 2) {
@@ -259,29 +297,30 @@ public class DiGraphMatrix extends DiGraph {
                      * DiGraphList y DiGraphMatrix
                      */
                     this.numNodes = new Integer(tokens[0]).intValue();
-                    this.numArcs = new Integer(tokens[1]).intValue();
-                    this.fillFromFile(inbuff, fileName);
+                    int nArc = new Integer(tokens[1]).intValue();
+                    this.fillFromFile(inbuff, fileName, nArc);
                 } else {
-                    throw new ExcepcionFormatoIncorrecto("En la primera linea" +
-                            " hay un error de sintaxis: Se esperaba un numero" +
-                            " seguido de otro numero (numNodos numArcos) y se" +
-                            " encontro: " + tokens[0] + " " + tokens[1] + "\n");
+                    throw new ExcepcionFormatoIncorrecto("\nEn la primera" +
+                            " linea hay un error de sintaxis:\nSe esperaba un" +
+                            " numero seguido de otro numero (numNodos" +
+                            " numArcos) y se encontro:\n\t\"" + tokens[0] +
+                            " " + tokens[1] + "\"\n");
                 }
             } else {
-                throw new ExcepcionFormatoIncorrecto("En la primera linea hay" +
-                        "un error de sintaxis: Se esperaban dos elementos (" +
-                        "numNodos numArcos), y se encontro:\n\t"+
-                        tokens.toString());
+                throw new ExcepcionFormatoIncorrecto("\nEn la primera linea" +
+                        " hay un error de sintaxis:\nSe esperaban dos" +
+                        " elementos (numNodos numArcos), y se encontro:\n\t" +
+                        "\"" + tokens.toString() + "\"");
             }
         } else if (!(new File(fileName)).exists()) {
-            throw new ExcepcionArchivoNoExiste("Problema al leer el archivo " +
-                    "\"" + fileName +"\": EL ARCHIVO NO EXISTE!!!");
+            throw new ExcepcionArchivoNoExiste("\nProblema al leer el archivo" +
+                    " \"" + fileName +"\": EL ARCHIVO NO EXISTE!!!");
         } else if (!(new File(fileName)).isFile()) {
-            throw new ExcepcionNoEsArchivo("Problema al leer el archivo \"" +
-                    fileName +"\": NO ES UN ARCHIVO!!!");
+            throw new ExcepcionNoEsArchivo("\nProblema al leer el archivo" +
+                    " \"" + fileName +"\": NO ES UN ARCHIVO!!!");
         } else if (!(new File(fileName)).canRead()) {
-            throw new ExcepcionArchivoNoSePuedeLeer("Problema al leer el ar" +
-                    "chivo \"" + fileName +"\": ESTE ARCHIVO NO SE PUEDE" +
+            throw new ExcepcionArchivoNoSePuedeLeer("\nProblema al leer el" +
+                    " archivo \"" + fileName +"\": ESTE ARCHIVO NO SE PUEDE" +
                     " LEER!!!");
         }
     }
@@ -326,11 +365,10 @@ public class DiGraphMatrix extends DiGraph {
 
     @Override
     public String toString() {
-        String string = "Numero de NODOS: " + this.numNodes + "\n" +
-                "Numero de ARCOS: " + this.numArcs + "\n ARCOS:\n";
+        String string = this.numNodes + " " + this.numArcs;
         for( int i = 0; i < this.numNodes; ++i ) {
             for( int j = 0; j < this.numNodes; ++j ) {
-                string += matrix[i][j] ? "(" + i + ", " + j +")\n" : "";
+                string += matrix[i][j] ? "\n" + i + " " + j : "";
 	    }
 	}
 	return string;
@@ -361,32 +399,85 @@ public class DiGraphMatrix extends DiGraph {
                         " al programador...");
                 System.out.println("MENSAJE:" + fnfe.getMessage() + "\n" +
                         "CAUSA:" + fnfe.getCause().toString() + "\n");
-                throw new ExcepcionArchivoNoSePuedeEscribir("Problema escri" +
-                        "biendo en el archivo \"" + fileName + "\"");
+                throw new ExcepcionArchivoNoSePuedeEscribir("\nProblema" +
+                        " escribiendo en el archivo \"" + fileName + "\"");
             }
         } else if (!(new File(fileName)).exists()) {
-            throw new ExcepcionArchivoNoExiste("Problema al leer el archivo " +
-                    "\"" + fileName +"\": EL ARCHIVO NO EXISTE!!!");
+            throw new ExcepcionArchivoNoExiste("\nProblema al leer el" +
+                    " archivo \"" + fileName +"\":\n\tEL ARCHIVO NO" +
+                    " EXISTE!!!\n");
         } else if (!(new File(fileName)).isFile()) {
-            throw new ExcepcionNoEsArchivo("Problema al leer el archivo \"" +
-                    fileName +"\": NO ES UN ARCHIVO!!!");
+            throw new ExcepcionNoEsArchivo("\nProblema al leer el archivo" +
+                    " \"" + fileName + "\":\n\tNO ES UN ARCHIVO!!!\n");
         } else if (!(new File(fileName)).canWrite()) {
-            throw new ExcepcionArchivoNoSePuedeEscribir("Problema al leer el " +
-                    "archivo \"" + fileName +"\": ESTE ARCHIVO NO SE PUEDE" +
-                    " LEER!!!");
+            throw new ExcepcionArchivoNoSePuedeEscribir("\nProblema al leer" +
+                    " el archivo \"" + fileName +"\":\n\tESTE ARCHIVO NO SE" +
+                    " PUEDE LEER!!!\n");
         }
     }
 
     // METODOS PRIVADOS AUXILIARES:
 
-    private void fillFromFile(BufferedReader inbuff, String fileName)
-                                        throws ExcepcionArchivoNoSePuedeLeer,
-                                               ExcepcionFormatoIncorrecto
+    private void fillFromFile(BufferedReader inbuff, String fileName, int nArc)
+                                throws ExcepcionArchivoNoSePuedeLeer,
+                                       ExcepcionFormatoIncorrecto,
+                                       ExcepcionArcoRepetido,
+                                       ExcepcionInconsistenciaNumeroDeNodos,
+                                       ExcepcionInconsistenciaNumeroDeArcos
     {
         String linea = "";
         String[] tokens;
         int k = 2;
+        try {
+            linea = inbuff.readLine();
+        } catch (IOException ioe) {
+            System.out.println("Esto no deberia pasar, contacte"
+                    + " al programador...");
+            System.out.println("MENSAJE:" + ioe.getMessage() + "\n"
+                    + "CAUSA:" + ioe.getCause().toString() + "\n");
+            throw new ExcepcionArchivoNoSePuedeLeer("Problema Leyendo la"
+                        + "linea " + k + " del archivo \"" + fileName
+                        + "\"");
+        }
         while (linea != null) {
+            tokens = linea.split(" ");
+            if (tokens.length == 2) {
+                if (tokens[0].matches("[0-9]+?") &&
+                    tokens[1].matches("[0-9]+?")) {
+                    int src = (new Integer(tokens[0]).intValue());
+                    int dst = (new Integer(tokens[1]).intValue());
+                    if ((src < 0 || this.numNodes <= src)) {
+                        throw new ExcepcionInconsistenciaNumeroDeNodos("\nEl " +
+                                "grafo de entrada tiene un numero de nodos " +
+                                "distinto al indicado al principio del ar" +
+                                "chivo:\nEncontrado \"" + tokens[0] + "\" en" +
+                                " la linea " + k + ", y " +
+                                "se esperaba en el intervalo [0 - " +
+                                nArc + "]");
+                    } else if (dst < 0 || this.numNodes <= dst) {
+                        throw new ExcepcionInconsistenciaNumeroDeNodos("\nEl " +
+                                "grafo de entrada tiene un numero de nodos " +
+                                "distinto al indicado al principio del ar" +
+                                "chivo:\nEncontrado \"" + tokens[1] + "\" en" +
+                                " la linea " + k + ", y " +
+                                "se esperaba en el intervalo [0 - " +
+                                nArc + "]");
+                    }
+                    this.addArc(src,dst);
+                } else {
+                    throw new ExcepcionFormatoIncorrecto("\nEn la linea " + k +
+                            " del archivo \"" + fileName + "\"" +
+                            " hay un error de sintaxis:\nSe esperaba un numero"+
+                            " seguido de otro numero (src dst) y se encontró" +
+                            ": \n\t\"" + tokens[0] + " " + tokens[1] + "\"\n");
+                }
+            } else {
+                throw new ExcepcionFormatoIncorrecto("\nEn la linea " + k +
+                            " del archivo \"" + fileName + "\" hay " +
+                        "un error de sintaxis:\nSe esperaban dos elementos (" +
+                        "src dst), y se encontro:\n\t\"" + linea + "\"\n");
+            }
+            k++;
             try {
                 linea = inbuff.readLine();
             } catch (IOException ioe) {
@@ -398,27 +489,12 @@ public class DiGraphMatrix extends DiGraph {
                         + "linea " + k + " del archivo \"" + fileName
                         + "\"");
             }
-            tokens = linea.split(" ");
-            if (tokens.length == 2) {
-                if (tokens[0].matches("[0-9]+?") &&
-                    tokens[1].matches("[0-9]+?")) {
-                    this.addArc(new Integer(tokens[0]).intValue(),
-                                new Integer(tokens[1]).intValue());
-                } else {
-                    throw new ExcepcionFormatoIncorrecto("En la linea " + k +
-                            " del archivo \"" + fileName + "\"" +
-                            " hay un error de sintaxis: Se esperaba un numero" +
-                            " seguido de otro numero (numNodos numArcos) y se" +
-                            " encontro: " + tokens[0] + " " + tokens[1] + "\n");
-                }
-            } else {
-                throw new ExcepcionFormatoIncorrecto("En la linea " + k +
-                            " del archivo \"" + fileName + "\" hay " +
-                        "un error de sintaxis: Se esperaban dos elementos (" +
-                        "numNodos numArcos), y se encontro:\n\t"+
-                        tokens.toString());
-            }
-            k++;
+        }
+        if (linea == null && k-2 != nArc) {
+            throw new ExcepcionInconsistenciaNumeroDeArcos("El grafo de entra" +
+                    "da tiene menos arcos que los indicados al principio del " +
+                    "archivo:\nTiene " + (k-2) + " arco(s), y se esperaba(n) " +
+                    nArc + " arco(s)");
         }
     }
 

@@ -6,14 +6,17 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 /**
- * DiGraphList es una clase concreta que ud debe implementar
+ * DiGraphList es una clase concreta que representa un digrafo utilizando la
+ * estructura Lista.
  * Los arcos son almacenados como una lista y son almacenados en un
- * arreglo donde la posicion i
+ * arreglo donde la posicion i representa el nodo en el que inciden.
  *
  * @author Les profs
- * @version 1.0
+ * @author Victor De Ponte, 05-38087
+ * @author Karina Valera, 06-40414
+ * @version 2.0
  * @since 1.6
-**/
+ */
 public class DiGraphList extends DiGraph {
 
     // arreglo de lista de los arcos, inArc[i] contine la lista
@@ -132,7 +135,6 @@ public class DiGraphList extends DiGraph {
             salida.addArc(i, i);
         }
         int flag;
-        int counter = 0;
         do {
             boolean stop = false;
             flag = salida.numArcs;
@@ -143,7 +145,6 @@ public class DiGraphList extends DiGraph {
                         int c = salida.outArcs[b].get(j).getDst();
                         if (!salida.isArc(a, c)) {
                             salida.addArc(a, c);
-                            counter++;
                             stop = true;
                         }
                     }

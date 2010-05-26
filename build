@@ -1,0 +1,17 @@
+#!/bin/bash
+#set -o xtrace
+shopt -s extglob
+
+echo -e "Archivos fuente a compilar:\n"
+
+for i in $(ls *.java)
+do
+echo $i
+done
+echo -e ""
+for i in $(ls *.java)
+do
+echo "Compilando $i"
+javac $i
+echo -e "$i compilado...\n"
+done

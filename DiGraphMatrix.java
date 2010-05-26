@@ -5,10 +5,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 
-/** * DiGraphMatrix es una clase concreta que ud debe implementar
+/**
+ * DiGraphMatrix es una clase concreta que representa un digrafo usando la
+ * estructura de la matriz de adyacencias.
  *
  * @author Les profs
- * @version 1.0
+ * @author Victor De Ponte, 05-38087
+ * @author Karina Valera, 06-40414
+ * @version 2.0
  * @since 1.6
 **/
 public class DiGraphMatrix extends DiGraph {
@@ -119,23 +123,24 @@ public class DiGraphMatrix extends DiGraph {
         DiGraphMatrix nuevo = this.clone();
         // Añadimos la diagonal principal...
         for (int i = 0; i < nuevo.numNodes; i++){
-            if (!nuevo.isArc(i, i)) {
-                nuevo.addArc(i, i);
-            }
+            nuevo.addArc(i, i);
         }
         // Se calculan los demás arcos transitivos
-        for (int i = 0; i < this.numNodes; i++){
-            for (int j = 0; j < this.numNodes; j++){
-	        if (nuevo.matrix[i][j] && i != j){
-	            for (int k = 0; k < this.numNodes; k++){
-                        if ((nuevo.matrix[i][k] || nuevo.matrix[j][k]) &&
-                                !nuevo.isArc(i, k)) {
-                            nuevo.addArc(i, k);
+        int flag;
+        do {
+            flag = nuevo.numArcs;
+            for (int i = 0; i < nuevo.numNodes; i++) {
+                for (int j = 0; j < nuevo.numNodes; j++) {
+                    if (nuevo.matrix[i][j] && i != j) {
+                        for (int k = 0; k < nuevo.numNodes; k++) {
+                            if (nuevo.isArc(j, k) && !nuevo.isArc(i, k)) {
+                                nuevo.addArc(i, k);
+                            }
                         }
-		    }
-	        }
-	    }
-        }
+                    }
+                }
+            }
+        } while (nuevo.numArcs > flag);
         return nuevo;
     }
 

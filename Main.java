@@ -85,8 +85,10 @@ public class Main {
             }
             if (matrix) {
                 g1 = new DiGraphMatrix(args[0]);
+                System.out.println("Usando Matrix...");
             } else {
                 g1 = new DiGraphList(args[0]);
+                System.out.println("Usando Lista...");
             }
             g2 = g1.alcance();
             if (args.length == 2) {
@@ -98,8 +100,8 @@ public class Main {
             System.out.println("Sistanxis:\n\n\t# java Main <inFileName>" +
                     " <outFileName>\n\nDonde 'inFileName' es el archivo que" +
                     " contiene el grafo de entrada, y 'outFileName' sera el" +
-                    " archivo donde se almacenará la salida del programa. Si" +
-                    " 'outFileName' no existe, éste se creará...");
+                    " archivo donde se almacenará la salida del programa." +
+                    " Tanto 'inFileName' como 'outFileName' deben existir...");
         }
     }
 }

@@ -463,8 +463,10 @@ public class Lista<E> implements List<E>{
     // Funciones auxiliares:
 
     /**
-     * Pequeño programa de prueba del tipo Lista(E)
-     * @param args no recibe nada.
+     * Pequeño programa de prueba del tipo Lista(E). Implementa un menu de
+     * opciones bastante intuitivo que permite probar casi todos (si no, todos)
+     * los metodos de Lista.
+     * @param args null, no se usa.
      */
     public static void main (String[] args) {
         System.out.println("\n\n\t\tBienvenido al programa de prueba de" +

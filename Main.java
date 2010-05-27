@@ -5,11 +5,52 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
+ * Programa principal que se encargará de recibir un DiGraph representado en un
+ * archivo de texto plano según el formato establecido en la cátedra indicado en
+ * el enunciado, y calcular el DiGraph que contiene los mismos nodos y los
+ * mismos arcos que el DiGraph de entrada, unudo con los arcos transitivos y
+ * reflexivos (Alcance). Formato:
+ * numNodos numArcos
+ * nodoSrc nodoDst
+ * nodoSrc nodoDst
+ * nodoSrc nodoDst
+ * nodoSrc nodoDst
+ * nodoSrc nodoDst
+ *    .       .
+ *    .       .
+ *    .       .
+ * nodoSrc nodoDst
  *
- * @author victor
+ * @author Victor De Ponte, 05-38087
+ * @author Karina Valera, 06-40414
+ * @version 2.0
+ * @since 1.6
  */
 public class Main {
 
+    /**
+     * Lee la primera linea del archivo {@code fileName}, y basado en el numero
+     * de Nodos y el numero de Arcos, decide si utilizar la implementación
+     * DiGraphMatrix (en caso de haber mas arcos que nodos), o la implementación
+     * DiGraphList (en caso de haber mas nodos que arcos).
+     * <b>pre</b>: <i>comportamiento normal</i>: que el archivo {@code fileName}
+     * exista, sea un archivo, se pueda leer, no tenga errores de formato ni
+     * inconsistencias en cuanto al numero de nodos y de arcos;
+     * <i>comportamiento excepcional</i>: lo contrario.
+     * <b>post</b>: <i>comportamiento normal</i>: devuelve {@code 1} si el
+     * digrafo del archivo {@code fileName} tiene mas nodos que arcos, 0 si
+     * tiene mas arcos que nodos y -1 en caso de que no haya podido decidir.
+     * <i>comportamiento excepcional</i>: Arroja la correspondiente excepción de
+     * acuerdo a lo mencionado en la sección <b>Throws</b>.
+     *
+     * @param fileName Nombre del archivo a leer
+     * @return devuelve {@code 1} si el digrafo del archivo {@code fileName}
+     * tiene mas nodos que arcos, 0 si tiene mas arcos que nodos y -1 en caso de
+     * que no haya podido decidir.
+     * @throws IOException En caso de que {@code fileName} no exista, no sea un
+     * archivo, no se pueda leer, tenga un error de formato, o alguna
+     * inconsistencia en cuanto al numero de arcos o el numero de nodos
+     */
     public static int decidir (String fileName) throws IOException {
         if ((new File(fileName)).exists() &&
             (new File(fileName)).isFile() &&
@@ -72,6 +113,32 @@ public class Main {
         return -1;
     }
 
+    /**
+     * Método main (principal), que llama a todas las funciones necesarias y
+     * hace todas las verificaciones necesarias para calcular el alcance del
+     * DiGraph de entrada.
+     * <blockquote>
+     * <p><b>Sintaxis</b>:</p>
+     * <p>$ java Main inputFile [outputFile]</p>
+     * </blockquote>
+     * Donde {@code inputFile} es el archivo de entrada y {@code outputFile} es
+     * el archivo de salida. Note que el archivo de salida es opcional. En caso
+     * de no introducirlo la salida se mostrará por la salida estándar.
+     * <b>pre</b>: {@code inputFile} debe existir, ser un archivo, poder leerse,
+     * no puede tener errores de formato ni inconsistencias en el número de
+     * nodos o arcos. En caso de introducir {@code outputFile}, éste también
+     * debe existir, ser un archivo y ser escribible.
+     * <b>post</b>: Si se introdujo {@code outputFile}, éste contrendrá la
+     * representación del DiGraph de alcance asociado a {@code inputFile} según
+     * el formato ya descrito. En caso de que {@code outputFile} no haya sido
+     * introducido por el usuario, esta representación se mostrará en la salida
+     * estándar.
+     * @param args arreglo que recibe los parámetros del usuario (archivos de
+     * entrada y salida).
+     * @throws IOException En caso de que {@code fileName} no exista, no sea un
+     * archivo, no se pueda leer, tenga un error de formato, o alguna
+     * inconsistencia en cuanto al numero de arcos o el numero de nodos
+     */
     public static void main(String[] args) throws IOException {
         if (0 < args.length) {
             DiGraph g1 = null;

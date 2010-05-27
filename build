@@ -12,6 +12,7 @@ echo -e ""
 for i in $(ls *.java)
 do
 echo "Compilando $i"
-javac $i
+javac $i 2> /dev/null
 echo -e "$i compilado...\n"
 done
+echo -e "\nTareas terminadas..."

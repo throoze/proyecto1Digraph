@@ -152,10 +152,8 @@ public class Main {
             }
             if (matrix) {
                 g1 = new DiGraphMatrix(args[0]);
-                System.out.println("Usando Matrix...");
             } else {
                 g1 = new DiGraphList(args[0]);
-                System.out.println("Usando Lista...");
             }
             g2 = g1.alcance();
             if (args.length == 2) {

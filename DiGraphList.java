@@ -38,7 +38,9 @@ public class DiGraphList extends DiGraph {
 
     /**
      * Crea un DiGraphList con n nodos y sin arcos.
-     * @param n numero de nodos iniciales de grafo
+     * <b>Pre</b>: {@code n} &lt; {@code 0}
+     * <b>Post</b>: este DiGraphList tiene {@code n} nodos y ningún arco.
+     * @param n el número de nodos con los que se inicializa este DiGraphList.
      */
     public DiGraphList(int n) {
         this.inArcs = new List[n];
@@ -52,17 +54,39 @@ public class DiGraphList extends DiGraph {
     }
 
     /**
-     * Crea un DiGraphList a partir del contenido de un archivo
-     * @param fileName nombre del archivo
+     * Crea un DiGraphList a partir del contenido del archivo.
+     * <blockquote>
+     * <p><b>Sintaxis</b>:</p>
+     * <p>numNodos numArcos</p>
+     * <p>nodoSrc nodoDst</p>
+     * <p>nodoSrc nodoDst</p>
+     * <p>nodoSrc nodoDst</p>
+     * <p>   .       .   </p>
+     * <p>   .       .   </p>
+     * <p>   .       .   </p>
+     * <p>nodoSrc nodoDst</p>
+     * </blockquote>
+     * <b>Pre</b>: {@code fileName} debe existir, ser un archivo, poder leerse,
+     * no puede tener errores de formato ni inconsistencias en el número de
+     * nodos o arcos.
+     * <b>Post</b>: Este DiGraphList se inicializa exitosamente con el DiGraph
+     * representado en el archivo {@code fileName}.
+     * @param fileName Nombre del archivo a leer
+     * @throws IOException En caso de que {@code fileName} no exista, no sea un
+     * archivo, no se pueda leer, tenga un error de formato, o alguna
+     * inconsistencia en cuanto al numero de arcos o el numero de nodos
      */
     public DiGraphList(String fileName) throws IOException {
         this();
         this.read(fileName);
     }
 
-    /**
+   /**
      * Crea un DiGraphList a partir del DiGraph g
-     * @param g
+     * <b>Pre</b>: {@code true;}
+     * <b>Post</b>: {@code this.equals(g)}
+     *
+     * @param g el grafo fuente.
      */
     public DiGraphList(DiGraph g) {
         this();
@@ -82,8 +106,19 @@ public class DiGraphList extends DiGraph {
         }
     }
 
-    // Métodos:
-
+   /**
+     * Agrega un arco a este DiGraphList.
+     * <b>Pre</b>: Los nodos src y dst deben encontrase en el DigraphList y no
+     * debe existir un arco entre ellos.
+     * <b>Post</b>: El DigraphList contendra un nuevo arco que tendra a src y
+     * dst como nodos fuente y destino respectivamente.
+     *
+     * @param src nodo fuente del arco
+     * @param dst nodo destino del arco
+     * @return El arco agregado y null en caso de que los nodos src y dst no se
+     * encuentren en el DiGraphList.
+     *
+     */
     public Arc addArc(int src, int dst) {
         if ((0 <= src && src < this.numNodes) &&
             (0 <= dst && dst < this.numNodes)) {
@@ -101,6 +136,20 @@ public class DiGraphList extends DiGraph {
         }
     }
 
+    /**
+     * Agrega un arco a este DiGraphList
+     * <b>Pre</b>: Los nodos src y dst deben encontrase en el DigraphList y no
+     * debe existir un arco entre ellos.
+     * <b>Post</b>: El DigraphList contendra un nuevo arco que tendra a src y
+     * dst como nodos fuente y destino respectivamente y el costo {@code costo}.
+     *
+     * @param src nodo fuente del arco
+     * @param dst nodo destino del arco
+     * @param costo costo del arco
+     * @return El arco agregado y null en caso de que los nodos src y dst no se
+     * encuentren en el DiGraphList.
+     *
+     */
     public Arc addArc(int src, int dst, double costo) {
         if ((0 <= src && src < this.numNodes) &&
             (0 <= dst && dst < this.numNodes)) {
@@ -118,6 +167,13 @@ public class DiGraphList extends DiGraph {
         }
     }
 
+    /**
+     * Permite agregar <i>num</i> nuevos nodos a este DiGraphList.
+     * <b>Pre</b>: Debe existir un DigraphList.
+     * <b>Post</b>: El DigraphList contendrá <i>num</i> nodos nuevos.
+     *
+     * @param num numero de nodos a agregar
+     */
     public void addNodes(int num) {
         if (0 < num) {
             List<Arc>[] arcosDeEntrada = new List[this.numNodes + num];
@@ -134,10 +190,14 @@ public class DiGraphList extends DiGraph {
 
     /**
      * Retorna un Digraph que es la clausura transitiva de este DiGraph
-     * calculada usando el algoritmo Roy-Warshal
+     * calculada usando un algoritmo analogo al de Roy-Warshal.
+     * <b>Pre</b>: Debe existir un DigraphList.
+     * <b>Post</b>: Se obtendra un Digraph relacionado con la lista de arcos
+     * adyacentes del DigraphList, calculada usando un algoritmo analogo al
+     * de Roy -Warshal
      *
      * @return un Digraph que es la clausura transitiva de este DiGraph
-     * calculada usando el algoritmo Roy-Warshal
+     * calculada usando un algoritmo analogo al de Roy-Warshal
      */
     @Override
     public DiGraph alcance() {
@@ -165,12 +225,31 @@ public class DiGraphList extends DiGraph {
         return salida;
     }
 
+    /**
+     * Genera una copia de este DiGraphList.
+     * <b>Pre</b>: Debe existir un DiGraphList.
+     * <b>Post</b>: El DiGraphList tendra una copia exacta.
+     *
+     * @return una copia de este DiGraphList.
+     */
     @Override
     public DiGraphList clone() {
         DiGraphList nuevo = new DiGraphList(this);
         return nuevo;
     }
 
+    /**
+     * Elimina un arco de este DiGraphList.
+     * <b>Pre</b>: Los nodos fuente y destino, es decir nodeIniId y nodeFinId
+     * deben existir en el DigraphList.
+     * <b>Post</b>: No existira arco entre los nodos nodeIniId y nodeFinId que
+     * pertencen al DigraphList.
+     *
+     * @param nodeIniId nodo fuente del arco
+     * @param nodeFinId nodo destino del arco
+     * @return El arco eliminado y null en caso de que los nodos nodeIniId y
+     * nodeFinId no se encuentren en el DiGraphList.
+     */
     public Arc delArc(int nodeIniId, int nodeFinId) {
         if ((0 <= nodeIniId && nodeIniId < this.numNodes) &&
             (0 <= nodeFinId && nodeFinId < this.numNodes)) {
@@ -187,6 +266,16 @@ public class DiGraphList extends DiGraph {
         }
     }
 
+   /**
+     * Determina si el DiGraph g es igual a este DiGraphList.
+     * <b>Pre</b>: debe existir un DigraphList y un Digraph g.
+     * <b>Post</b>: Se obtendra true en caso de que los grafos relacionados sean
+     * iguales y false en caso contrario.
+     *
+     * @param g el grafo con el que se quiere comparar
+     * @return true si los dos DiGraph contienen los mismos nodos y los mismos
+     * arcos, return false en caso contrario.
+     */
     public boolean equals(DiGraph g) {
         if (this.numArcs == g.numArcs && this.numNodes == g.numNodes) {
             boolean out = true;
@@ -202,7 +291,18 @@ public class DiGraphList extends DiGraph {
         }
     }
 
-    // preguntar si es asi...
+    /**
+     * Busca el Arco cuyo nodo fuente es nodoSrc y nodo destino es nodoDst.
+     * <b>Pre</b>: Los nodos nodoSrc y nodoDst deben pertenecer al DigraphList
+     * y debe existir un arco entre ellos.
+     * <b>Post</b>: Se obtendra, en caso de que exista, el arco cuyos nodos
+     * fuente y destino son nodoSrc y nodoDst respectivamente.
+     *
+     * @param nodoSrc nodo fuente
+     * @param nodoDst nodo destino
+     *
+     * @return el Arco cuyo nodo fuente es nodoSrc y nodo destino es nodoDst.
+     */
     public Arc getArc(int nodoSrc, int nodoDst) {
         if (this.isArc(nodoSrc, nodoDst)) {
             return (new Arc(nodoSrc,nodoDst));
@@ -211,34 +311,104 @@ public class DiGraphList extends DiGraph {
         }
     }
 
+    /**
+     * Retorna el grado de un nodo en este DiGraphList.
+     * <b>Pre</b>: El nodo nodeId debe pertencer al DigraphList.
+     * <b>Post</b>: Se obtendra el numero de arcos que llegan y salen de nodeId,
+     * es decir el grado.
+     *
+     * @param nodeId identificacion del nodo
+     * @return el grado del nodo nodeId en este Grafo
+     */
     public int getDegree(int nodeId) {
         return this.getInDegree(nodeId) + this.getOutDegree(nodeId);
     }
 
+    /**
+     * Retorna el grado interno de un nodo en este DiGraphList.
+     * <b>Pre</b>: El nodo nodeId debe pertenecer al DigraphList.
+     * <b>Post</b>: Se obtendra el numero de arcos que llegan a NodeId, es decir
+     * el grado interno.
+     *
+     * @param nodeId identificacion del nodo
+     * @return el grado interno del nodo nodeId en este Grafo.
+     */
     public int getInDegree(int nodeId) {
         return this.inArcs[nodeId].size();
     }
 
+    /**
+     * Retorna la lista de arcos que tienen a nodeId como destino.
+     * <b>Pre</b>: El nodoId debe pertencer al DigraphList.
+     * <b>Post</b>: Se obtendra la lista de arcos que tienen a nodeId como nodo
+     * final.
+     *
+     * @param nodeId identificador del nodo
+     * @return la lista de arcos que tienen a nodeId como destino.
+     */
     public List<Arc> getInEdges(int nodeId) {
         return this.inArcs[nodeId];
     }
 
+    /**
+     * Retorna el numero de arcos en el DigraphList.
+     * <b>Pre</b>: Debe existir un DigraphList.
+     * <b>Post</b>: Se obtendra el numero de arcos que pertencen al
+     * DigraphList.
+     *
+     * @return numero de arcos que hay en el DigraphList.
+     */
     public int getNumberOfArcs() {
         return this.numArcs;
     }
 
+    /**
+     * Retorna el numero de nodos que hay en el DigraphList.
+     * <b>Pre</b>: Debe existir un DigraphList.
+     * <b>Post</b>: Se obtendra el numero de nodos que pertencen al
+     * DigraphList.
+     *
+     * @return numero de nodos en el grafo
+     */
     public int getNumberOfNodes() {
         return this.numNodes;
     }
 
+    /**
+     * Retorna el grado externo de un nodo en este DiGraphList.
+     * <b>Pre</b>: El nodo nodeId debe pertenecer al DigraphList.
+     * <b>Post</b>: Se obtendra el numero de arcos que salen de nodeId, es decir
+     * el grado externo.
+     *
+     * @param nodeId identificacion del nodo
+     * @return el grado externo del nodo nodeId en este Grafo
+     */
     public int getOutDegree(int nodeId) {
         return this.outArcs[nodeId].size();
     }
 
+    /**
+     * Retorna la lista de arcos que tienen a nodeId como fuente
+     * <b>Pre</b>: El nodo nodeId debe pertenecer al DigraphList.
+     * <b>Post</b>:Se obtendra la lista de arcos que tienen a nodeId como nodo
+     * inicial.
+     *
+     * @param nodeId identificador del nodo
+     * @return la lista de arcos que tienen a nodeId como fuente
+     */
     public List<Arc> getOutEdges(int nodeId) {
         return this.outArcs[nodeId];
     }
 
+    /**
+     * Retorna la lista de predecesores del nodo nodeId
+     * <b>Pre</b>: El nodo nodeId debe pertenecer al DigraphList.
+     * <b>Post</b>: Se obtendra la lista de nodos que tienen a nodeId como nodo
+     * de destino.
+     *
+     * @param nodeId el id del nodo del que se quieren los predecesores
+     * @return lista de predecesores de nodeId
+     */
     public List<Integer> getPredecesors(int nodeId) {
         List<Integer> predecesors = new Lista();
         Arc[] arrArcs = (Arc[])this.inArcs[nodeId].toArray();
@@ -248,6 +418,15 @@ public class DiGraphList extends DiGraph {
         return predecesors;
     }
 
+    /**
+     * Retorna la lista de sucesores del nodo nodeId
+     * <b>Pre</b>: El nodoId debe pertenecer al DigraphList.
+     * <b>Post</b>: Se obtendra la lista de nodos que tienen a nodeId como nodo
+     * fuente.
+     *
+     * @param nodeId el id del nodo del que se quieren los sucesores
+     * @return lista de sucesores de nodeId
+     */
     public List<Integer> getSucesors(int nodeId) {
         List<Integer> sucesors = new Lista();
         Arc[] arrArcs = (Arc[])this.outArcs[nodeId].toArray();
@@ -257,7 +436,17 @@ public class DiGraphList extends DiGraph {
         return sucesors;
     }
 
-    //Acordarse de borrar el monton de comentarios...
+    /**
+     * Indica si un arco existe en este DiGraphList.
+     * <b>Pre</b>: Los nodos src y dst deben pertenecer al DigraphList.
+     * <b>Post</b>: Se obtendra true en caso de que el arco exista y false si
+     * ocurre lo contrario.
+     *
+     * @param src el id del nodo origen del arco
+     * @param dst el id del nodo destino del arco
+     * @return true si exite un arco desde el nodo src hasta el nodo dst.
+     * false en caso contrario
+     */
     @Override
     public boolean isArc(int src, int dst) {
         boolean es = false;
@@ -268,6 +457,31 @@ public class DiGraphList extends DiGraph {
         return es;
     }
 
+    /**
+     * Inicializa este DiGraphList en el DiGraph representado en el contenido
+     * del archivo {@code fileName}.
+     * <blockquote>
+     * <p><b>Sintaxis</b>:</p>
+     * <p>numNodos numArcos</p>
+     * <p>nodoSrc nodoDst</p>
+     * <p>nodoSrc nodoDst</p>
+     * <p>nodoSrc nodoDst</p>
+     * <p>   .       .   </p>
+     * <p>   .       .   </p>
+     * <p>   .       .   </p>
+     * <p>nodoSrc nodoDst</p>
+     * </blockquote>
+     * <b>Pre</b>: {@code fileName} debe existir, ser un archivo, poder leerse,
+     * no puede tener errores de formato ni inconsistencias en el número de
+     * nodos o arcos.
+     * <b>Post</b>: Este DiGraphList se inicializa exitosamente con el DiGraph
+     * representado en el archivo {@code fileName}.
+     *
+     * @param fileName Nombre del archivo a leer
+     * @throws IOException En caso de que {@code fileName} no exista, no sea un
+     * archivo, no se pueda leer, tenga un error de formato, o alguna
+     * inconsistencia en cuanto al numero de arcos o el numero de nodos
+     */
     public void read(String fileName) throws IOException {
         if ((new File(fileName)).exists() &&
             (new File(fileName)).isFile() &&
@@ -340,6 +554,14 @@ public class DiGraphList extends DiGraph {
         }
     }
 
+    /**
+     * Remueve todos los arcos de este grafo
+     * <b>Pre</b>: Debe existir un DigraphList, y sus nodos deben estar
+     * conectados mediante arcos.
+     * <b>Post</b>: Se obtendra la lista de los arcos que fueron eliminados.
+     *
+     * @return lista de arcos eliminados
+     */
     public List<Arc> removeAllArcs() {
         List<Arc> lista = new Lista();
         for (int i = 0; i < this.numNodes; i++) {
@@ -353,6 +575,18 @@ public class DiGraphList extends DiGraph {
         return lista;
     }
 
+    /**
+     * Invierte la direccion de un arco
+     * <b>Pre</b>: Los nodos nodeIniId y nodeFinId deben pertenecer al
+     * DigraphList, y seran el nodo fuente y destino respectivamente en caso
+     * de que exista un arco entre ellos.
+     * <b>Post</b>: Se obtendra true en caso de que el arco haya sido invertido
+     * y false en caso contrario.
+     *
+     * @param nodeIniId nodo fuente del arco antes de invertirlo
+     * @param nodeFinId nodo destino del arco antes de invertirlo
+     * @return true si el arco fue invertido, false en caso contrario
+     */
     public boolean reverseArc(int nodeIniId, int nodeFinId) {
         if ((0 <= nodeIniId && nodeIniId < this.numNodes) &&
             (0 <= nodeFinId && nodeFinId < this.numNodes)) {
@@ -368,6 +602,16 @@ public class DiGraphList extends DiGraph {
         }
     }
 
+    /**
+     * Invierte todos los arcos del DiGraphList.
+     * <b>Pre</b>: Debe existir un DipraphList.
+     * <b>Post</b>: Se obtiene true en caso de que se hayan invertido todos los
+     * arcos y false en caso contrario.
+     *
+     * @return true si todos los arcos fueron invertidos, false en caso
+     * contrario. En caso de que algun nodo no puede ser invertido, el grafo
+     * debe quedar sin alteraciones.
+     */
     public boolean reverseArcs() {
         List<Arc> arcos = this.removeAllArcs();
         while (!arcos.isEmpty()) {
@@ -377,6 +621,13 @@ public class DiGraphList extends DiGraph {
         return true;
     }
 
+    /**
+     * Retorna la representacion en String de este DiGraphList.
+     * <b>Pre</b>: Debe existir un DigraphList.
+     * <b>Post</b>: Se obtendra la representacion en String del DigraphList.
+     *
+     * @return la representacion en String de este DiGraphList.
+     */
     @Override
     public String toString() {
         String string = this.numNodes + " " + this.numArcs;
@@ -389,6 +640,28 @@ public class DiGraphList extends DiGraph {
         return string;
     }
 
+    /**
+     * Escribe la representacion de este DiGraph en el archivo {@code fileName},
+     * usando el formato siguiente:
+     * <blockquote>
+     * <p><b>Sintaxis</b>:</p>
+     * <p>numNodos numArcos</p>
+     * <p>nodoSrc nodoDst</p>
+     * <p>nodoSrc nodoDst</p>
+     * <p>nodoSrc nodoDst</p>
+     * <p>&nbsp;.&nbsp;.</p>
+     * <p>&nbsp;.&nbsp;.</p>
+     * <p>&nbsp;.&nbsp;.</p>
+     * <p>nodoSrc nodoDst</p>
+     * </blockquote>
+     * <b>pre</b>: {@code fileName} debe existir, ser un archivo, y poder
+     * escribirse.
+     * <b>post</b>: El archivo {@code fileName} contiene la representación de
+     * este DiGraph.
+     * @param fileName Archivo a escribir
+     * @throws IOException En caso de que el archivo {@code fileName} no exista,
+     * no sea un archivo o no se pueda escribir en el.
+     */
     public void write(String fileName) throws IOException {
         if ((new File(fileName)).exists() &&
             (new File(fileName)).isFile() &&
@@ -432,6 +705,29 @@ public class DiGraphList extends DiGraph {
 
     // METODOS PRIVADOR AUXILIARES:
 
+    /**
+     * Método auxiliar para llenar este DiGraph leyendo desde el archivo de
+     * nombre {@code fileName}.
+     * <b>Pre</b>: {@code fileName} debe existir, ser un archivo, poder leerse,
+     * no puede tener errores de formato ni inconsistencias en el número de
+     * nodos o arcos. {@code inbuff} debe estar abierto y haberse leido solo la
+     * primera linea. {@code nArc} debe ser el numero de arcos leido en la
+     * primera linea de {@code fileName}.
+     * <b>Post</b>: Este DiGraphList se inicializa exitosamente con el DiGraph
+     * representado en el archivo {@code fileName}.
+     * @param inbuff Buffer de lectura a travez del cual se lee {@code fileName}
+     * @param fileName Nombre del archivo a leer
+     * @param nArc Número de arcos que tiene este DiGraph.
+     * @throws ExcepcionArchivoNoSePuedeLeer En caso de que {@code fileName} no
+     * se pueda leer
+     * @throws ExcepcionFormatoIncorrecto En caso de que el formato especificado
+     * no se cumpla
+     * @throws ExcepcionArcoRepetido En caso de que haya un arco repetido
+     * @throws ExcepcionInconsistenciaNumeroDeNodos En caso de que se consiga un
+     * nodo que no pertenezca a este DiGraph
+     * @throws ExcepcionInconsistenciaNumeroDeArcos en caso de que haya más o
+     * menos arcos que los indicados en la primera linea ({@code nArc})
+     */
     private void fillFromFile(BufferedReader inbuff, String fileName, int nArc)
                                 throws ExcepcionArchivoNoSePuedeLeer,
                                        ExcepcionFormatoIncorrecto,

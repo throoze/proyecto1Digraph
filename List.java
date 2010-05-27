@@ -12,7 +12,7 @@ public interface List <E> {
     /**
      * Agrega <i>element</i> a la lista.
      *
-     * @param Elemento de tipo E, con el que se declaro el objeto
+     * @param element Elemento de tipo E, con el que se declaro el objeto
      * lista particular,
      * @return {@code true} si el elemento fue insertado, false en caso contrario
      */
@@ -22,7 +22,7 @@ public interface List <E> {
      * Agrega <i>element</i> a la lista en la posicion <i>i</i>, si 
      * <i>i</i> &gt; que size() el elemento se agrega al final de lista.
      *
-     * @param Elemento de tipo E, con el que se declaro el objeto
+     * @param element Elemento de tipo E, con el que se declaro el objeto
      * lista particular,
      * @return true si el elemento fue insertado, false en caso contrario
      */
@@ -54,7 +54,7 @@ public interface List <E> {
     /**
      * Determina si el objeto <i>o</i> es igual a la lista actual. 
      *
-     * @param la lista con la que se desea comparar
+     * @param o la lista con la que se desea comparar
      * 
      * @return true si las dos listas tienen el mismo tamaño y contienen los
      * mismos objetos en el mismo orden. false en caso contrario

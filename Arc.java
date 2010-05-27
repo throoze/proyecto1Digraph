@@ -128,7 +128,7 @@ public class Arc {
      * pre: {@code true;}
      * post: {@code this.cost == c;}
      *
-     * @param el costo a ser asignado a este Arco.
+     * @param c el costo a ser asignado a este Arco.
      */
     public void setCost(double c) {
        cost = c;
@@ -206,7 +206,7 @@ public class Arc {
     /**
      * Retorna la representacion en String del Arc
      * pre: {@code true;}
-     * post: {@code el String de resultado es la representacion en String de
+     * post: el {@code String} de resultado es la representacion en String de
      * {@code this Arc}, con el formato {@code (src, dst)}
      *
      * @return la representacion en String de este Arc

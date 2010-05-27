@@ -19,6 +19,7 @@ import java.io.PrintStream;
  */
 public class DiGraphList extends DiGraph {
 
+    // Modelo de representación:
     // arreglo de lista de los arcos, inArc[i] contine la lista
     // de los arcos que cuyo destino es el nodo i
     private List<Arc> inArcs[];
@@ -84,24 +85,34 @@ public class DiGraphList extends DiGraph {
     // Métodos:
 
     public Arc addArc(int src, int dst) {
-        if (!(this.isArc(src, dst))) {
-            Arc nuevo = new Arc(src,dst);
-            this.inArcs[dst].add(nuevo);
-            this.outArcs[src].add(nuevo);
-            this.numArcs++;
-            return (nuevo);
+        if ((0 <= src && src < this.numNodes) &&
+            (0 <= dst && dst < this.numNodes)) {
+            if (!(this.isArc(src, dst))) {
+                Arc nuevo = new Arc(src, dst);
+                this.inArcs[dst].add(nuevo);
+                this.outArcs[src].add(nuevo);
+                this.numArcs++;
+                return (nuevo);
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
     }
 
     public Arc addArc(int src, int dst, double costo) {
-        if (!(this.isArc(src, dst))) {
-            Arc nuevo = new Arc(src,dst,costo);
-            this.inArcs[dst].add(nuevo);
-            this.outArcs[src].add(nuevo);
-            this.numArcs++;
-            return (nuevo);
+        if ((0 <= src && src < this.numNodes) &&
+            (0 <= dst && dst < this.numNodes)) {
+            if (!(this.isArc(src, dst))) {
+                Arc nuevo = new Arc(src, dst, costo);
+                this.inArcs[dst].add(nuevo);
+                this.outArcs[src].add(nuevo);
+                this.numArcs++;
+                return (nuevo);
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
@@ -161,11 +172,16 @@ public class DiGraphList extends DiGraph {
     }
 
     public Arc delArc(int nodeIniId, int nodeFinId) {
-        if (this.isArc(nodeIniId, nodeFinId)) {
-            Arc arco = new Arc(nodeIniId, nodeFinId);
-            this.inArcs[nodeFinId].remove(arco);
-            this.outArcs[nodeIniId].remove(arco);
-            return arco;
+        if ((0 <= nodeIniId && nodeIniId < this.numNodes) &&
+            (0 <= nodeFinId && nodeFinId < this.numNodes)) {
+            if (this.isArc(nodeIniId, nodeFinId)) {
+                Arc arco = new Arc(nodeIniId, nodeFinId);
+                this.inArcs[nodeFinId].remove(arco);
+                this.outArcs[nodeIniId].remove(arco);
+                return arco;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
@@ -244,31 +260,12 @@ public class DiGraphList extends DiGraph {
     //Acordarse de borrar el monton de comentarios...
     @Override
     public boolean isArc(int src, int dst) {
-        return this.outArcs[src].contains(new Arc(src,dst));
-        /*
-        if (0 <= src && src < this.outArcs.length &&
-            0 <= dst && dst < this.outArcs.length){
-            Arc arco = new Arc(src,dst);
-            System.out.println("El tamano de outArcs es: "+this.outArcs.length);
-            System.out.println("src es: "+src);
-            for (int i = 0; i < this.outArcs[src].size(); i++) {
-                if (this.outArcs[src].get(i).equals(arco)) {
-                    return true;
-                }
-            }
-
-            // Otra posibilidad
-
-            Object[] arreglo = this.outArcs[src].toArray();
-            for (int i = 0; i < arreglo.length; i++) {
-                if (((Arc)arreglo[i]).equals(new Arc(src, dst))) {
-                    return true;
-                }
-            }
+        boolean es = false;
+        if ((0 <= src && src < this.numNodes) &&
+            (0 <= dst && dst < this.numNodes)) {
+            es = this.outArcs[src].contains(new Arc(src,dst));
         }
-        return false;
-         *
-         */
+        return es;
     }
 
     public void read(String fileName) throws IOException {
@@ -357,10 +354,15 @@ public class DiGraphList extends DiGraph {
     }
 
     public boolean reverseArc(int nodeIniId, int nodeFinId) {
-        if (this.isArc(nodeIniId, nodeFinId)) {
-            this.delArc(nodeIniId, nodeFinId);
-            this.addArc(nodeFinId, nodeIniId);
-            return true;
+        if ((0 <= nodeIniId && nodeIniId < this.numNodes) &&
+            (0 <= nodeFinId && nodeFinId < this.numNodes)) {
+            if (this.isArc(nodeIniId, nodeFinId)) {
+                this.delArc(nodeIniId, nodeFinId);
+                this.addArc(nodeFinId, nodeIniId);
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }

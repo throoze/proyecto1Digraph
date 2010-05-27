@@ -96,9 +96,9 @@ En el archivo
 El grafo que representa
 
  O ---------> 1
+ /\           |
  |            |
  |            |
  |            |
- |            |
- \/          \/
+ |           \/
  3 <--------- 2

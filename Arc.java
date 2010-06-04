@@ -192,6 +192,20 @@ public class Arc {
     }
 
     /**
+     * Permite saber si un arco esta vacio o no;
+     * <b>Pre</b>: true;
+     * <b>Post</b>: devuelve true si este arco esta vacio, false en caso
+     * contrario.
+     * @return true si este arco esta vacio, false en caso contrario.
+     */
+    public boolean isEmpty() {
+        return (this.cost == -1.0 &&
+                this.dst == -1 &&
+                this.id == null &&
+                this.src == -1);
+    }
+
+    /**
      * Permite establecer el nodo destino de {@code this Arc}
      * pre: {@code true;}, aunque en el programa llamador probablemente
      * {@code destino} deba pertenecer al Digrafo en uso.

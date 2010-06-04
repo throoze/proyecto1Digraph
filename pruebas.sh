@@ -2,11 +2,11 @@
 
 #Probar los archivos en dimacs
 base=/home/victor/ntfs/proyectos/proyecto1/src
-#javac *.java 2> /dev/null
+javac *.java 2> /dev/null
 cd $base/random
 for i in $(ls)
 do
- cd $base/random/$i
+  cd $base/random/$i
        for j in $(ls *.input)
        do
                nombre=$(echo $j | cut -d . -f 1)

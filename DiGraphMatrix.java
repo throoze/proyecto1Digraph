@@ -170,15 +170,17 @@ public class DiGraphMatrix extends DiGraph {
     @Override
     public void addNodes(int num) {
         if (0 < num) {
-            DiGraphMatrix nuevo = new DiGraphMatrix(this.numNodes + num);
+            boolean[][] matriz = new boolean[this.numNodes + num]
+                                            [this.numNodes + num];
             for (int i = 0; i < this.numNodes; i++) {
                 for (int j = 0; j < this.numNodes; j++) {
                     if (this.matrix[i][j]) {
-                        nuevo.matrix[i][j] = true;
+                        matriz[i][j] = true;
                     }
                 }
             }
             this.numNodes += num;
+            this.matrix = matriz;
         }
     }
 
@@ -193,30 +195,35 @@ public class DiGraphMatrix extends DiGraph {
      * calculada usando el algoritmo Roy-Warshal
      */
     @Override
-    public DiGraph alcance() {        
-        // Se trabaja sobre una copia, para no modificar el original
-        DiGraphMatrix nuevo = this.clone();
-        // Añadimos la diagonal principal...
-        for (int i = 0; i < nuevo.numNodes; i++){
-            nuevo.addArc(i, i);
+    public DiGraph alcance() {
+        DiGraphMatrix ret = null;
+
+        ret = this.clone();
+
+        // Se agrega la identidad
+        for( int i = 0; i < numNodes; ++i ) {
+            if (!ret.isArc(i, i)) {
+                ret.matrix[i][i] = true;
+                ret.numArcs++;
+            }
         }
-        // Se calculan los demás arcos transitivos
-        int flag;
-        do {
-            flag = nuevo.numArcs;
-            for (int i = 0; i < nuevo.numNodes; i++) {
-                for (int j = 0; j < nuevo.numNodes; j++) {
-                    if (nuevo.matrix[i][j] && i != j) {
-                        for (int k = 0; k < nuevo.numNodes; k++) {
-                            if (nuevo.isArc(j, k) && !nuevo.isArc(i, k)) {
-                                nuevo.addArc(i, k);
+
+        for( int k = 0; k < numNodes; ++k ) {
+            for( int i = 0; i < numNodes; ++i ) {
+                if( (i != k) && ret.isArc(i,k) ) {
+                    for( int j = 0; j < numNodes; ++j ) {
+                        if( ret.isArc(k,j) ) {
+                            if (!ret.isArc(i, j)) {
+                                ret.matrix[i][j] = true;
+                                ret.numArcs++;
                             }
                         }
                     }
                 }
             }
-        } while (nuevo.numArcs > flag);
-        return nuevo;
+        }
+
+        return ret;
     }
 
     /**
@@ -271,15 +278,19 @@ public class DiGraphMatrix extends DiGraph {
      */
     @Override
     public boolean equals(DiGraph g) {
-        boolean eq = true;
-        for(int i = 0; i < this.numNodes && eq; i++) {
-	    for(int j = 0; j < this.numNodes && eq; j++) {
-                if (this.matrix[i][j] != ((DiGraphMatrix)g).matrix[i][j]) {
-                    eq = false;
-		}
+        if (this.numArcs == g.numArcs && this.numNodes == g.numNodes) {
+            boolean eq = true;
+            for (int i = 0; i < this.numNodes && eq; i++) {
+                for (int j = 0; j < this.numNodes && eq; j++) {
+                    if (this.matrix[i][j] != ((DiGraphMatrix) g).matrix[i][j]) {
+                        eq = false;
+                    }
+                }
             }
+            return eq;
+        } else {
+            return false;
         }
-        return eq;
     }
 
     /**
